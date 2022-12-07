@@ -1,13 +1,16 @@
 import mysql.connector
-
-import mysql.connector
 import os
+from secret import password
 
-# Connect to the MySQL database
+# host      = localhost if the demo is running the MySQL DB on the local machine 
+# otherwise, we will figure it out when the time comes
+# user      = username (duh) 
+# password  = try to set up a secret file. we dont want our password pushed up into our git repo
+# database  = im guessing esports is correct
 mydb = mysql.connector.connect(
   host="localhost",
   user="root",
-  password="yourpassword",
+  password=password,
   database="esports"
 )
 
@@ -81,8 +84,9 @@ while True:
   elif choice == 4:
     break # Exit the program
 
-)
+
 
 # TODO: add functions from the google doc
+# TODO: make all these functions user friendly. EX: on adding games, prompt the player for if they want to create a new roster, or use an existing one. 
 
 # https://www.w3schools.com/python/python_mysql_getstarted.asp
