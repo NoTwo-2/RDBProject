@@ -37,6 +37,17 @@ def list_tables():
   for table in tables:
     print(table[0])
 
+def print_table(table):
+    query = ("SELECT * FROM " + table)
+    mycursor = mydb.cursor()
+    mycursor.execute(query)
+    result = mycursor.fetchall()
+
+    # Print the result of the query
+    print("Tables in " + table + ":")
+    for row in result:
+        print(row)
+    
 # Create a function to describe a table in the database
 def describe_table():
   # Ask the user to enter the name of the table
