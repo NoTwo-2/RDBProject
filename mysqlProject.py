@@ -22,7 +22,8 @@ def show_menu():
   print("1. List all tables")
   print("2. Describe a table")
   print("3. Execute a query")
-  print("4. Exit")
+  print("4. Add a tournament")
+  print("5. Exit")
 
 # Create a function to list all tables in the database
 def list_tables():
@@ -65,6 +66,20 @@ def execute_query():
   print("Query Result:")
   for row in result:
     print(row)
+    
+def add_tournament():
+    print ("=== Add a tournament ===")
+    name = input("Enter tournament name: ")
+    state = input ("Enter tournament state: ")
+    city = input("Enter tournament city: ")
+    address = input("Enter tournament street address: ")
+    s_year = input("Enter tournament start year: ")
+    s_month = input("Enter tournament start month: ")
+    s_day = input("Enter tournament start day: ")
+
+    query = "INSERT INTO tournament(tournament_name, start_day, start_month, start_year, street_address, city, state) VALUES (%s, %s, %s, %s, %s, %s)" % (name, s_day, s_month, s_year, address, city, state)
+    print(query)
+    #execute_query(query)
 
 # Create an infinite loop to show the menu and handle user input
 while True:
@@ -82,6 +97,9 @@ while True:
     execute_query() # Execute a query
     input("Press enter to continue...") # Wait for the user to press enter
   elif choice == 4:
+    add_tournament()
+    input("Press enter to continue...") # Wait for the user to press enter
+  elif choice == 5:
     break # Exit the program
 
 
