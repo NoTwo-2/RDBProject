@@ -223,7 +223,7 @@ def editMenu():
         elif choice == 3:
             teamMenu() # Execute a query
             input("Press enter to continue...") # Wait for the user to press enter
-        elif choice == 5:
+        elif choice == 4:
             sponsorMenu() # Execute a query
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 5:
