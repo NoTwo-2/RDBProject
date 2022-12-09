@@ -190,8 +190,9 @@ def editMenu():
         print("1. Tournaments")
         print("2. Games")
         print("3. Teams")
-        print("4. Players")
-        print("5. Back") 
+        print("4. Sponsors")
+        print("5. Players")
+        print("6. Back") 
         choice = int(input("Enter your choice(1-5): "))
         # Handle the user's choice
         if choice == 1:
@@ -204,11 +205,14 @@ def editMenu():
         elif choice == 3:
             teamMenu() # Execute a query
             input("Press enter to continue...") # Wait for the user to press enter
-        elif choice == 4:
+        elif choice == 5:
+            sponsorMenu() # Execute a query
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 5:
             print("Not yet implemented.")
 #            playerMenu()
             input("Press enter to continue...") # Wait for the user to press enter
-        elif choice == 5:
+        elif choice == 6:
             return
 
 def tournamentMenu():
