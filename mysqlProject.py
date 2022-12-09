@@ -15,6 +15,7 @@ mydb = mysql.connector.connect(
 )
 
 ## === MODIFY FUNCTIONS === ##
+
 def modify_player():
     print_table('player')
     player_id = int(input('Select player_id to modify: '))
@@ -72,6 +73,38 @@ def modify_tournament():
     execute_query(query,True,data)
 
 ## === ADD FUNCTIONS === ##
+def add_roster():
+    mycursor = mydb.cursor()
+    print("=== Create a roster===")
+    print_table('team')
+    team_id = int(input("Enter team_id that you would like for your roster: "))
+    print_team_player_list(team_id)
+    player_1_id = int(input("Enter player_id for the first player "))
+    player_2_id = int(input("Enter player_id for the second player "))
+    player_3_id = int(input("Enter player_id for the third player "))
+    query = (
+        "INSERT INTO roster (team_id ) VALUES ("+str(team_id)+");"
+    )
+    mycursor.execute(query, False)
+    player1_query = (
+            "INSERT INTO roster_member (roster_id,player_id ) VALUES (%s, %s);"
+    )
+    player1_data = (mycursor.lastrowid, player_1_id)
+
+    player2_query = (
+            "INSERT INTO roster_member (roster_id,player_id ) VALUES (%s, %s);"
+    )
+    player2_data = (mycursor.lastrowid, player_2_id)
+
+    player3_query = (
+            "INSERT INTO roster_member (roster_id,player_id ) VALUES (%s, %s);"
+    )
+    player3_data = (mycursor.lastrowid,player_3_id)
+
+    execute_query(player1_query,True,player1_data)
+    execute_query(player2_query, True, player2_data)
+    execute_query(player3_query, True, player3_data)
+    
 def add_player():
     print("=== Add a player ===")
     in_game_name = input("Enter player in game name: ")
@@ -145,6 +178,14 @@ def add_team_to_tournament():
     execute_query(query,True,data)
 
 ## === DELETE FUNCTIONS === ##
+
+def delete_roster():
+    print("=== Delete a roster ===")
+    print_table('roster')
+    roster_id = input("Enter your roster_id to be deleted: ")
+    query = ("DELETE FROM roster WHERE roster_id = " + str(roster_id) + ";")
+    execute_query(query, False)
+
 def delete_player():
     print_table('player')
     player_id = int(input('Select player to delete: '))
