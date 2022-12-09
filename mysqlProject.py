@@ -281,7 +281,8 @@ def editMenu():
         print("3. Teams")
         print("4. Sponsors")
         print("5. Players")
-        print("6. Back") 
+        print("6. Roster")
+        print("7. Back") 
         choice = int(input("Enter your choice(1-5): "))
         # Handle the user's choice
         if choice == 1:
@@ -299,9 +300,12 @@ def editMenu():
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 5:
             print("Not yet implemented.")
-#            playerMenu()
+            playerMenu()
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 6:
+            rosterMenu()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 7:
             return
 
 def tournamentMenu():
