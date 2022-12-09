@@ -15,6 +15,16 @@ mydb = mysql.connector.connect(
 )
 
 ## === MODIFY FUNCTIONS === ##
+def modify_team():
+    print_table('team')
+    team_id = int(input('Select team_id to modify: '))
+    print("=== Modify a team ===")
+    team_name = input("Enter team name: ")
+    query = (
+        "UPDATE team SET team_name = %s WHERE team_id = %s;"
+    )
+    data = (team_name,team_id)
+    execute_query(query,True,data)
 
 def modify_tournament():
     #list the table
@@ -36,6 +46,13 @@ def modify_tournament():
     execute_query(query,True,data)
 
 ## === ADD FUNCTIONS === ##
+def add_team():
+    print("=== Add a team ===")
+    team_name = input("Enter team name: ")
+    query = (
+        "INSERT INTO team(team_name) VALUES ('%s');" % (team_name)
+    )
+    execute_query(query,False)
 
 def add_tournament():
     print("=== Add a tournament ===")
@@ -54,6 +71,12 @@ def add_tournament():
     execute_query(query,True,data)
 
 ## === DELETE FUNCTIONS === ##
+def delete_team():
+    print_table('team')
+    team_id = int(input('Select team_id to delete: '))
+    print("=== Delete a team ===")
+    query = ("DELETE FROM team WHERE team_id = " + str(team_id) + ";")
+    execute_query(query, False)
 
 def delete_tournament():
     print_table('tournament')
