@@ -34,7 +34,7 @@ def debug():
   print("3. Execute a query")
   print("4. Back")
   while True:
-    choice = int(input("Enter your choice(1-4)"))
+    choice = int(input("Enter your choice(1-4): "))
     # Handle the user's choice
     if choice == 1:
       list_tables() # List all tables
