@@ -10,11 +10,37 @@ import os
 mydb = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="password",
+    password="",
     database="esports"
 )
 
 ## === MODIFY FUNCTIONS === ##
+def modify_player():
+    print_table('player')
+    player_id = int(input('Select player_id to modify: '))
+    print("=== Modify a player ===")
+    in_game_name = input("Enter player in game name: ")
+    print_table('team')
+    team_id = int(input('Select player team (-1 if no team) '))
+    first_name = input("Enter player first name ")
+    last_name = input("Enter player last name ")
+    start_year = input("Enter the players first year ")
+    start_month = input("Enter the players first month ")
+    start_day = input("Enter the players first day ")
+    if team_id == -1:
+        query = (
+            "UPDATE player SET in_game_name = %s, first_name = %s, last_name = %s, start_day = %s, start_month = %s, start_year = %s "
+            "WHERE player_id = %s;"
+        )
+        data = (in_game_name, first_name, last_name, start_day, start_month, start_year, player_id)
+    else:
+        query = (
+            "UPDATE player SET in_game_name = %s, team_id = %s, first_name = %s, last_name = %s, start_day = %s, start_month = %s, start_year = %s "
+            "WHERE player_id = %s;"
+        )
+        data = (in_game_name, team_id, first_name, last_name, start_day, start_month, start_year, player_id)
+    execute_query(query,True,data)
+
 def modify_team():
     print_table('team')
     team_id = int(input('Select team_id to modify: '))
@@ -46,6 +72,31 @@ def modify_tournament():
     execute_query(query,True,data)
 
 ## === ADD FUNCTIONS === ##
+def add_player():
+    print("=== Add a player ===")
+    in_game_name = input("Enter player in game name: ")
+    print_table('team')
+    team_id = int(input('Select player team (-1 if no team) '))
+    first_name = input("Enter player first name ")
+    last_name = input("Enter player last name ")
+    start_year = input("Enter the players first year ")
+    start_month = input("Enter the players first month ")
+    start_day = input("Enter the players first day ")
+    if team_id == -1:
+        query = (
+            "INSERT INTO player(in_game_name, first_name, last_name, start_day, start_month, start_year) "
+            "VALUES (%s, %s, %s, %s, %s, %s ,%s);"
+        )
+        data = (in_game_name, first_name, last_name, start_day, start_month, start_year)
+    else:
+        query = (
+            "INSERT INTO player(in_game_name, team_id, first_name, last_name, start_day, start_month, start_year) "
+            "VALUES (%s, %s, %s, %s, %s, %s ,%s);"
+        )
+        data = (in_game_name, team_id, first_name, last_name, start_day, start_month, start_year)
+    execute_query(query,True,data)
+    
+
 def add_team():
     print("=== Add a team ===")
     team_name = input("Enter team name: ")
@@ -84,6 +135,13 @@ def add_team_to_tournament():
     execute_query(query,True,data)
 
 ## === DELETE FUNCTIONS === ##
+def delete_player():
+    print_table('player')
+    player_id = int(input('Select player to delete: '))
+    print("=== Delete a player ===")
+    query = ("DELETE FROM player WHERE player_id = " + str(player_id) + ";")
+    execute_query(query, False)
+
 def delete_team():
     print_table('team')
     team_id = int(input('Select team_id to delete: '))
@@ -195,6 +253,7 @@ def debug():
         elif choice == 4:
             return
 
+# TODO: add function add_team_to_tournament to a menu that makes sense
 def editMenu():
     while True:
         os.system('clear') # Clear the screen
@@ -282,13 +341,13 @@ def sponsorMenu():
         choice = int(input("Enter your choice(1-4): "))
         # Handle the user's choice
         if choice == 1:
-            add_sponsor()
+            # add_sponsor()
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 2:
-            modify_sponsor()
+            # modify_sponsor()
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 3:
-            delete_sponsor()
+            # delete_sponsor()
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 4:
             return
