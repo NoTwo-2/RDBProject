@@ -202,8 +202,7 @@ def editMenu():
 #            gameMenu() # Describe a table
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 3:
-            print("Not yet implemented.")
-#            teamMenu() # Execute a query
+            teamMenu() # Execute a query
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 4:
             print("Not yet implemented.")
