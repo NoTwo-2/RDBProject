@@ -53,6 +53,19 @@ def add_tournament():
     data = (name, s_day, s_month, s_year, address, city, state)
     execute_query(query,True,data)
 
+def add_team_to_tournament():
+    print("=== Add a team to a tournament ===")
+    print_table('tournament')
+    tournament_id = int(input('Select tournament_id to add a team to '))
+    print_table('team')
+    team_id = int(input('Select team_id to add to the tournament '))
+    query = (
+            "INSERT INTO tournament_participant(tournament_id, team_id) "
+            "VALUES (%s, %s)"
+            )
+    data = (tournament_id, team_id)
+    execute_query(query,True,data)
+
 ## === DELETE FUNCTIONS === ##
 
 def delete_tournament():
