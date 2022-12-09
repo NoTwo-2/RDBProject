@@ -15,6 +15,16 @@ mydb = mysql.connector.connect(
 )
 
 ## === MODIFY FUNCTIONS === ##
+def modify_team():
+    print_table('team')
+    team_id = int(input('Select team_id to modify: '))
+    print("=== Modify a team ===")
+    team_name = input("Enter team name: ")
+    query = (
+        "UPDATE team SET team_name = %s WHERE team_id = %s;"
+    )
+    data = (team_name,team_id)
+    execute_query(query,True,data)
 
 def modify_tournament():
     #list the table
@@ -36,6 +46,13 @@ def modify_tournament():
     execute_query(query,True,data)
 
 ## === ADD FUNCTIONS === ##
+def add_team():
+    print("=== Add a team ===")
+    team_name = input("Enter team name: ")
+    query = (
+        "INSERT INTO team(team_name) VALUES ('%s');" % (team_name)
+    )
+    execute_query(query,False)
 
 def add_tournament():
     print("=== Add a tournament ===")
@@ -67,6 +84,12 @@ def add_team_to_tournament():
     execute_query(query,True,data)
 
 ## === DELETE FUNCTIONS === ##
+def delete_team():
+    print_table('team')
+    team_id = int(input('Select team_id to delete: '))
+    print("=== Delete a team ===")
+    query = ("DELETE FROM team WHERE team_id = " + str(team_id) + ";")
+    execute_query(query, False)
 
 def delete_tournament():
     print_table('tournament')
@@ -192,8 +215,7 @@ def editMenu():
 #            gameMenu() # Describe a table
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 3:
-            print("Not yet implemented.")
-#            teamMenu() # Execute a query
+            teamMenu() # Execute a query
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 4:
             print("Not yet implemented.")
@@ -248,6 +270,28 @@ def teamMenu():
         elif choice == 4:
             return
 
+def sponsorMenu():
+    while True:
+        os.system('clear') # Clear the screen
+        print("=== Sponsor Menu ===")
+        print("--------------------")
+        print("1. Add a sponsor")
+        print("2. Modify a sponsor")
+        print("3. Delete a sponsor")
+        print("4. Back") 
+        choice = int(input("Enter your choice(1-4): "))
+        # Handle the user's choice
+        if choice == 1:
+            add_sponsor()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 2:
+            modify_sponsor()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 3:
+            delete_sponsor()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 4:
+            return
 
 # Create an infinite loop to show the menu and handle user input
 while True:
