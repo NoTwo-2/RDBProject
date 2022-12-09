@@ -46,9 +46,9 @@ CREATE TABLE `game` (
   KEY `team_2_roster_id_idx` (`team_2_roster_id`),
   CONSTRAINT `game_tournament_id` FOREIGN KEY (`tournament_id`) REFERENCES `tournament` (`tournament_id`) ON DELETE CASCADE,
   CONSTRAINT `team_1_id` FOREIGN KEY (`team_1_id`) REFERENCES `team` (`team_id`) ON DELETE SET NULL,
-  CONSTRAINT `team_1_roster_id` FOREIGN KEY (`team_1_roster_id`) REFERENCES `roster` (`roster_id`),
+  CONSTRAINT `team_1_roster_id` FOREIGN KEY (`team_1_roster_id`) REFERENCES `roster` (`roster_id`) ON DELETE CASCADE,
   CONSTRAINT `team_2_id` FOREIGN KEY (`team_2_id`) REFERENCES `team` (`team_id`) ON DELETE SET NULL,
-  CONSTRAINT `team_2_roster_id` FOREIGN KEY (`team_2_roster_id`) REFERENCES `roster` (`roster_id`)
+  CONSTRAINT `team_2_roster_id` FOREIGN KEY (`team_2_roster_id`) REFERENCES `roster` (`roster_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -363,4 +363,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-12-08 21:50:18
+-- Dump completed on 2022-12-08 21:54:23
