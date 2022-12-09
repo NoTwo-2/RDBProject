@@ -27,8 +27,8 @@ DROP TABLE IF EXISTS `game`;
 CREATE TABLE `game` (
   `game_id` int NOT NULL AUTO_INCREMENT,
   `tournament_id` int NOT NULL,
-  `team_1_id` int NOT NULL,
-  `team_2_id` int NOT NULL,
+  `team_1_id` int DEFAULT NULL,
+  `team_2_id` int DEFAULT NULL,
   `team_1_roster_id` int NOT NULL,
   `team_2_roster_id` int NOT NULL,
   `start_time` int NOT NULL,
@@ -44,10 +44,10 @@ CREATE TABLE `game` (
   KEY `team_2_id_idx` (`team_2_id`),
   KEY `team_1_roster_id_idx` (`team_1_roster_id`),
   KEY `team_2_roster_id_idx` (`team_2_roster_id`),
-  CONSTRAINT `game_tournament_id` FOREIGN KEY (`tournament_id`) REFERENCES `tournament` (`tournament_id`),
-  CONSTRAINT `team_1_id` FOREIGN KEY (`team_1_id`) REFERENCES `team` (`team_id`),
+  CONSTRAINT `game_tournament_id` FOREIGN KEY (`tournament_id`) REFERENCES `tournament` (`tournament_id`) ON DELETE CASCADE,
+  CONSTRAINT `team_1_id` FOREIGN KEY (`team_1_id`) REFERENCES `team` (`team_id`) ON DELETE SET NULL,
   CONSTRAINT `team_1_roster_id` FOREIGN KEY (`team_1_roster_id`) REFERENCES `roster` (`roster_id`),
-  CONSTRAINT `team_2_id` FOREIGN KEY (`team_2_id`) REFERENCES `team` (`team_id`),
+  CONSTRAINT `team_2_id` FOREIGN KEY (`team_2_id`) REFERENCES `team` (`team_id`) ON DELETE SET NULL,
   CONSTRAINT `team_2_roster_id` FOREIGN KEY (`team_2_roster_id`) REFERENCES `roster` (`roster_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -76,8 +76,8 @@ CREATE TABLE `game_participant` (
   `deaths` int NOT NULL,
   PRIMARY KEY (`game_id`,`player_id`),
   KEY `participant_plater_id_idx` (`player_id`),
-  CONSTRAINT `participant_game_id` FOREIGN KEY (`game_id`) REFERENCES `game` (`game_id`),
-  CONSTRAINT `participant_plater_id` FOREIGN KEY (`player_id`) REFERENCES `player` (`player_id`)
+  CONSTRAINT `participant_game_id` FOREIGN KEY (`game_id`) REFERENCES `game` (`game_id`) ON DELETE CASCADE,
+  CONSTRAINT `participant_player_id` FOREIGN KEY (`player_id`) REFERENCES `player` (`player_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -108,7 +108,9 @@ CREATE TABLE `player` (
   `start_month` int DEFAULT NULL,
   `start_year` int DEFAULT NULL,
   PRIMARY KEY (`player_id`),
-  UNIQUE KEY `player_id_UNIQUE` (`player_id`)
+  UNIQUE KEY `player_id_UNIQUE` (`player_id`),
+  KEY `player_team_id_idx` (`team_id`),
+  CONSTRAINT `player_team_id` FOREIGN KEY (`team_id`) REFERENCES `team` (`team_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -149,7 +151,7 @@ CREATE TABLE `roster` (
   PRIMARY KEY (`roster_id`),
   UNIQUE KEY `roster_id_UNIQUE` (`roster_id`),
   KEY `roster_team_id_idx` (`team_id`),
-  CONSTRAINT `roster_team_id` FOREIGN KEY (`team_id`) REFERENCES `team` (`team_id`)
+  CONSTRAINT `roster_team_id` FOREIGN KEY (`team_id`) REFERENCES `team` (`team_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -175,8 +177,8 @@ CREATE TABLE `roster_member` (
   `player_id` int NOT NULL,
   PRIMARY KEY (`roster_id`,`player_id`),
   KEY `player_id_idx` (`player_id`),
-  CONSTRAINT `player_id` FOREIGN KEY (`player_id`) REFERENCES `player` (`player_id`),
-  CONSTRAINT `roster_id` FOREIGN KEY (`roster_id`) REFERENCES `roster` (`roster_id`)
+  CONSTRAINT `player_id` FOREIGN KEY (`player_id`) REFERENCES `player` (`player_id`) ON DELETE CASCADE,
+  CONSTRAINT `roster_id` FOREIGN KEY (`roster_id`) REFERENCES `roster` (`roster_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -203,7 +205,7 @@ CREATE TABLE `sponsor` (
   PRIMARY KEY (`sponsor_name`),
   UNIQUE KEY `sponsor_name_UNIQUE` (`sponsor_name`),
   KEY `sponsor_team_id_idx` (`sponsored_team_id`),
-  CONSTRAINT `sponsor_team_id` FOREIGN KEY (`sponsored_team_id`) REFERENCES `team` (`team_id`)
+  CONSTRAINT `sponsor_team_id` FOREIGN KEY (`sponsored_team_id`) REFERENCES `team` (`team_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -301,8 +303,8 @@ CREATE TABLE `tournament_participant` (
   `result` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`tournament_id`,`team_id`),
   KEY `team_id_idx` (`team_id`),
-  CONSTRAINT `participant_tournament_id` FOREIGN KEY (`tournament_id`) REFERENCES `tournament` (`tournament_id`),
-  CONSTRAINT `team_id` FOREIGN KEY (`team_id`) REFERENCES `team` (`team_id`)
+  CONSTRAINT `participant_tournament_id` FOREIGN KEY (`tournament_id`) REFERENCES `tournament` (`tournament_id`) ON DELETE CASCADE,
+  CONSTRAINT `team_id` FOREIGN KEY (`team_id`) REFERENCES `team` (`team_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -361,4 +363,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-12-08 19:08:26
+-- Dump completed on 2022-12-08 19:29:30
