@@ -257,6 +257,28 @@ def teamMenu():
         elif choice == 4:
             return
 
+def sponsorMenu():
+    while True:
+        os.system('clear') # Clear the screen
+        print("=== Sponsor Menu ===")
+        print("--------------------")
+        print("1. Add a sponsor")
+        print("2. Modify a sponsor")
+        print("3. Delete a sponsor")
+        print("4. Back") 
+        choice = int(input("Enter your choice(1-4): "))
+        # Handle the user's choice
+        if choice == 1:
+            add_sponsor()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 2:
+            modify_sponsor()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 3:
+            delete_sponsor()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 4:
+            return
 
 # Create an infinite loop to show the menu and handle user input
 while True:
