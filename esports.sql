@@ -123,6 +123,20 @@ INSERT INTO `player` VALUES (1,'Testdummy4',1,'Test','Dummy',5,12,1890),(2,'Test
 UNLOCK TABLES;
 
 --
+-- Temporary view structure for view `player_kill_death_ratio`
+--
+
+DROP TABLE IF EXISTS `player_kill_death_ratio`;
+/*!50001 DROP VIEW IF EXISTS `player_kill_death_ratio`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `player_kill_death_ratio` AS SELECT 
+ 1 AS `player_id`,
+ 1 AS `kill_death_ratio`,
+ 1 AS `games_played`*/;
+SET character_set_client = @saved_cs_client;
+
+--
 -- Table structure for table `roster`
 --
 
@@ -270,7 +284,7 @@ CREATE TABLE `tournament` (
 
 LOCK TABLES `tournament` WRITE;
 /*!40000 ALTER TABLE `tournament` DISABLE KEYS */;
-INSERT INTO `tournament` VALUES (1,'Test',12,4,1997,'420 Little Ceaser\'s Dr.','Rolla','WI'),(2,'Games Done Well',25,12,2015,'701 Convention Plaza','St. Louis','MO'),(3,'We The Best Videogame',5,5,2016,'1 Apple Park Way','Cupertino','CA');
+INSERT INTO `tournament` VALUES (1,'Test',12,4,2015,'420 Little Ceaser\'s Dr.','Rolla','WI'),(2,'Games Done Well',25,12,2015,'701 Convention Plaza','St. Louis','MO'),(3,'We The Best Videogame',5,5,2016,'1 Apple Park Way','Cupertino','CA');
 /*!40000 ALTER TABLE `tournament` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -303,6 +317,24 @@ INSERT INTO `tournament_participant` VALUES (1,1,'3rd'),(1,2,'1st'),(1,3,'2nd'),
 UNLOCK TABLES;
 
 --
+-- Final view structure for view `player_kill_death_ratio`
+--
+
+/*!50001 DROP VIEW IF EXISTS `player_kill_death_ratio`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `player_kill_death_ratio` AS select `r`.`player_id` AS `player_id`,(`r`.`kills` / `r`.`deaths`) AS `kill_death_ratio`,count(`g`.`game_id`) AS `games_played` from ((select `p`.`player_id` AS `player_id`,`p`.`in_game_name` AS `in_game_name`,sum(`g`.`kills`) AS `kills`,sum(`g`.`deaths`) AS `deaths` from (`player` `p` left join `game_participant` `g` on((`g`.`player_id` = `p`.`player_id`))) group by `p`.`player_id`) `r` join `game_participant` `g` on((`r`.`player_id` = `g`.`player_id`))) group by `r`.`player_id` order by (`r`.`kills` / `r`.`deaths`) desc */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
 -- Final view structure for view `team_win_rates`
 --
 
@@ -329,4 +361,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-12-08  2:52:25
+-- Dump completed on 2022-12-08 19:08:26
