@@ -16,18 +16,90 @@ mydb = mysql.connector.connect(
 
 
 # Create a function to show the main menu
-def show_menu():
-    os.system('clear')  # Clear the screen
-    print("MySQL Command Line Interface")
-    print("----------------------------")
-    print("1. List all tables")
-    print("2. Describe a table")
-    print("3. Execute a query")
-    print("4. Add a tournament")
-    print("5. Modify a tournament")
-    print("6. Delete a tournament")
-    print("7. Exit")
+def mainMenu():
+  os.system('clear') # Clear the screen
+  print("=== Main Menu ===")
+  print("-----------------")
+  print("1. Edit entity tables")
+  print("2. View table values")
+  print("3. Debug")
+  print("4. Exit")
 
+def debug():
+  os.system('clear') # Clear the screen
+  print("=== Debug Menu ===")
+  print("------------------")
+  print("1. List all tables")
+  print("2. Describe a table")
+  print("3. Execute a query")
+  print("4. Back")
+  while True:
+    choice = int(input("Enter your choice(1-4): "))
+    # Handle the user's choice
+    if choice == 1:
+      list_tables() # List all tables
+      input("Press enter to continue...") # Wait for the user to press enter
+    elif choice == 2:
+      describe_table() # Describe a table
+      input("Press enter to continue...") # Wait for the user to press enter
+    elif choice == 3:
+      test_query() # Execute a query
+      input("Press enter to continue...") # Wait for the user to press enter
+    elif choice == 4:
+      return
+
+def tournamentMenu():
+    while True:
+        os.system('clear') # Clear the screen
+        print("=== Tournament Menu ===")
+        print("-----------------------")
+        print("1. Add a tournament")
+        print("2. Modify a tournament")
+        print("3. Delete a tournament")
+        print("4. Back") 
+        choice = int(input("Enter your choice(1-4)"))
+        # Handle the user's choice
+        if choice == 1:
+            add_tournament()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 2:
+            modify_tournament()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 3:
+            delete_tournament()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 4:
+            return
+
+def editMenu():
+    while True:
+        os.system('clear') # Clear the screen
+        print("=== Edit Menu ===")
+        print("-----------------")
+        print("1. Tournaments")
+        print("2. Games")
+        print("3. Teams")
+        print("4. Players")
+        print("5. Back") 
+        choice = int(input("Enter your choice(1-4)"))
+        # Handle the user's choice
+        if choice == 1:
+            tournamentMenu() # List all tables
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 2:
+            print("Not yet implemented.")
+#            gameMenu() # Describe a table
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 3:
+            print("Not yet implemented.")
+#            teamMenu() # Execute a query
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 4:
+            print("Not yet implemented.")
+#            playerMenu()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 5:
+            return
 
 # Create a function to list all tables in the database
 def list_tables():
@@ -150,30 +222,20 @@ def add_tournament():
 
 # Create an infinite loop to show the menu and handle user input
 while True:
-    show_menu()  # Show the main menu
-    choice = int(input("Enter your choice: "))  # Ask the user to enter their choice
-
-    # Handle the user's choice
-    if choice == 1:
-        list_tables()  # List all tables
-        input("Press enter to continue...")  # Wait for the user to press enter
-    elif choice == 2:
-        describe_table()  # Describe a table
-        input("Press enter to continue...")  # Wait for the user to press enter
-    elif choice == 3:
-        test_query()  # Execute a query
-        input("Press enter to continue...")  # Wait for the user to press enter
-    elif choice == 4:
-        add_tournament()
-        input("Press enter to continue...")  # Wait for the user to press enter
-    elif choice == 5:
-        modify_tournament()
-        input("Press enter to continue...")  # Wait for the user to press enter
-    elif choice == 6:
-        delete_tournament()
-        input("Press enter to continue...")  # Wait for the user to press enter
-    elif choice == 7:
-        break  # Exit the program
+  mainMenu()
+  choice = int(input("Enter your choice (1-4): "))
+  if choice == 1:
+    editMenu() # Show editing menu
+    input("Press enter to continue...") # Wait for the user to press enter
+  elif choice == 2:
+    print("Not yet implemented.")
+#    viewMenu() # Show view menu
+    input("Press enter to continue...") # Wait for the user to press enter
+  elif choice == 3:
+    debug() # Show debug menu
+    input("Press enter to continue...") # Wait for the user to press enter
+  elif choice == 4:
+    break
 
 # TODO: add functions from the google doc
 # TODO: make all these functions user friendly. EX: on adding games, prompt the player for if they want to create a new roster, or use an existing one.
