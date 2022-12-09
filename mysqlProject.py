@@ -97,6 +97,16 @@ def add_player():
     execute_query(query,True,data)
     
 
+def add_sponsor():
+    sponsor_name = input("Enter sponsor name: ")
+    print_table('team')
+    sponsor_name_team_id = int(input("Enter the team_id that this sponsor is supporting: "))
+    query = (
+        "INSERT INTO sponsor(sponsor_name,sponsored_team_id) VALUES (%s, %s);"
+    )
+    data = (sponsor_name,sponsor_name_team_id)
+    execute_query(query,True,data)
+
 def add_team():
     print("=== Add a team ===")
     team_name = input("Enter team name: ")
@@ -142,6 +152,13 @@ def delete_player():
     query = ("DELETE FROM player WHERE player_id = " + str(player_id) + ";")
     execute_query(query, False)
 
+def delete_sponsor():
+    print("=== Delete a sponsor ===")
+    print_table('sponsor')
+    sponsor_team_id = input("Enter your sponsors team_id: ")
+    query = ("DELETE FROM sponsor WHERE sponsored_team_id = " + str(sponsor_team_id) + ";")
+    execute_query(query, False)
+    
 def delete_team():
     print_table('team')
     team_id = int(input('Select team_id to delete: '))
@@ -262,8 +279,9 @@ def editMenu():
         print("1. Tournaments")
         print("2. Games")
         print("3. Teams")
-        print("4. Players")
-        print("5. Back") 
+        print("4. Sponsors")
+        print("5. Players")
+        print("6. Back") 
         choice = int(input("Enter your choice(1-5): "))
         # Handle the user's choice
         if choice == 1:
@@ -277,10 +295,13 @@ def editMenu():
             teamMenu() # Execute a query
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 4:
+            sponsorMenu() # Execute a query
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 5:
             print("Not yet implemented.")
 #            playerMenu()
             input("Press enter to continue...") # Wait for the user to press enter
-        elif choice == 5:
+        elif choice == 6:
             return
 
 def tournamentMenu():
@@ -335,19 +356,61 @@ def sponsorMenu():
         print("=== Sponsor Menu ===")
         print("--------------------")
         print("1. Add a sponsor")
-        print("2. Modify a sponsor")
-        print("3. Delete a sponsor")
+        print("2. Delete a sponsor")
+        print("3. Back") 
+        choice = int(input("Enter your choice(1-4): "))
+        # Handle the user's choice
+        if choice == 1:
+            add_sponsor()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 2:
+            delete_sponsor()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 3:
+            return
+
+def playerMenu():
+    while True:
+        os.system('clear') # Clear the screen
+        print("=== Player Menu ===")
+        print("-------------------")
+        print("1. Add a player")
+        print("2. Modify a player")
+        print("3. Delete a player")
         print("4. Back") 
         choice = int(input("Enter your choice(1-4): "))
         # Handle the user's choice
         if choice == 1:
-            # add_sponsor()
+            add_player()
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 2:
-            # modify_sponsor()
+            modify_player()
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 3:
-            # delete_sponsor()
+            delete_player()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 4:
+            return
+
+def rosterMenu():
+    while True:
+        os.system('clear') # Clear the screen
+        print("=== Roster Menu ===")
+        print("-------------------")
+        print("1. Add a roster")
+        print("2. Modify a roster")
+        print("3. Delete a roster")
+        print("4. Back") 
+        choice = int(input("Enter your choice(1-4): "))
+        # Handle the user's choice
+        if choice == 1:
+            add_roster()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 2:
+            modify_roster()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 3:
+            delete_roster()
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 4:
             return
