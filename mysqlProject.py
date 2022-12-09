@@ -15,6 +15,7 @@ mydb = mysql.connector.connect(
 )
 
 ## === MODIFY FUNCTIONS === ##
+
 def modify_team():
     print_table('team')
     team_id = int(input('Select team_id to modify: '))
@@ -46,6 +47,16 @@ def modify_tournament():
     execute_query(query,True,data)
 
 ## === ADD FUNCTIONS === ##
+def add_sponsor():
+    sponsor_name = input("Enter sponsor name: ")
+    print_table('team')
+    sponsor_name_team_id = int(input("Enter the team_id that this sponsor is supporting: "))
+    query = (
+        "INSERT INTO sponsor(sponsor_name,sponsored_team_id) VALUES (%s, %s);"
+    )
+    data = (sponsor_name,sponsor_name_team_id)
+    execute_query(query,True,data)
+
 def add_team():
     print("=== Add a team ===")
     team_name = input("Enter team name: ")
@@ -71,6 +82,13 @@ def add_tournament():
     execute_query(query,True,data)
 
 ## === DELETE FUNCTIONS === ##
+def delete_sponsor():
+    print("=== Delete a sponsor ===")
+    print_table('sponsor')
+    sponsor_team_id = input("Enter your sponsors team_id: ")
+    query = ("DELETE FROM sponsor WHERE sponsored_team_id = " + str(sponsor_team_id) + ";")
+    execute_query(query, False)
+    
 def delete_team():
     print_table('team')
     team_id = int(input('Select team_id to delete: '))
