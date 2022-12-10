@@ -1,5 +1,7 @@
 import mysql.connector
 import os
+from tabulate import tabulate
+import string
 from secret import password
 
 # host      = localhost if the demo is running the MySQL DB on the local machine
@@ -338,11 +340,15 @@ def retrieval_query(query):
     mycursor = mydb.cursor()
     mycursor.execute(query)
     result = mycursor.fetchall()
-
+    column_names = mycursor.column_names
+    header_list = []
     # Print the result of the query
-    print("Query Result:")
-    for row in result:
-        print(row)
+    for name in column_names:
+        name = name.replace('_', ' ')
+        name = string.capwords(name)
+        header_list.append(name)
+    print(tabulate(result, headers=header_list, tablefmt="github"))
+    
 
 def print_team_player_list(team_id):
     query ="SELECT * FROM player WHERE team_id = "+str(team_id)+";"
@@ -573,32 +579,32 @@ def viewMenu():
         print("3. List Players")
         print("4. Back") 
         choice = int(input("Enter your choice(1-5): "))
+        os.system('clear') # Clear the screen
         # Handle the user's choice
         if choice == 1:
             listTournaments()
-            input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 2:
             listTeams()
-            input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 3:
             listPlayers()
-            input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 4:
             return
 
 def listTournaments(filter_attr = "", filter_val = -1):
-    while True:
-        print("Format: tournament_id, tournament_name, start_day, start_month, start_year, street_address, city, state, result")
+    no_quit = True
+    while no_quit:
         if filter_attr == "team_id":
-            query = ("SELECT T.tournament_id, tournament_name, start_day, start_month, start_year, street_address, city, state, result "
+            query = ("SELECT T.tournament_id, tournament_name, start_day, start_month, start_year, street_address, city, state, result AS placement "
                     "FROM tournament T JOIN tournament_participant P ON T.tournament_id = P.tournament_id WHERE team_id = " + str(filter_val))
         else:
             query = "SELECT * FROM tournament"
         retrieval_query(query)
 
-        tourney_id = int(input("Select torunament ID you want to view more information about (-1 to quit): "))
+        tourney_id = int(input("Select torunament ID you want to view more information about (-1 to go back, -2 to quit to menu): "))
         if tourney_id == -1:
-            return
+            return True
+        elif tourney_id == -2:
+            return False
         else:
             print("1. View teams")
             print("2. View games")
@@ -606,52 +612,66 @@ def listTournaments(filter_attr = "", filter_val = -1):
             choice = int(input("Select an option: "))
 
             if(choice == 1):
-                listTeams("tournament_id", tourney_id)
+                no_quit = listTeams("tournament_id", tourney_id)
             elif(choice == 2):
-                listGames("tournament_id", tourney_id)
+                no_quit = listGames("tournament_id", tourney_id)
                 
 def listGames(filter_attr = "", filter_val = -1):
-    while True:
-        print("Format: game_id, tournament_id, team_1_id, team_2_id, team_1_roster_id, team_2_roster_id, start_time, start_day, start_month, start_year, duration, winner_team_id")
+    no_quit = True
+    while no_quit:
         if filter_attr == "team_id":
-            query = "SELECT * FROM game WHERE team_1_id = " + str(filter_val) + " OR team_2_id = " + str(filter_val) + ";"
+            query = ("SELECT game_id, tournament_name, team_1_id, team_2_id, start_time, start_day, start_month, start_year, duration, winner_team_id "
+                    "FROM game NATURAL JOIN tournament WHERE team_1_id = " + str(filter_val) + " OR team_2_id = " + str(filter_val) + ";"
+            )
         elif filter_attr == "player_id":
-            query = ("SELECT G.game_id, tournament_id, team_1_id, team_2_id, team_1_roster_id, team_2_roster_id, start_time, start_day, start_month, start_year, duration, winner_team_id "
-                    "FROM game G JOIN game_participant P ON G.game_id = P.game_id WHERE player_id =" + str(filter_val))
+            query = ("SELECT G.game_id, tournament_name, team_1_id, team_2_id, start_time, start_day, start_month, start_year, duration, winner_team_id, kills, deaths "
+                    "FROM (SELECT * FROM game NATURAL JOIN tournament) G NATURAL JOIN game_participant P WHERE player_id =" + str(filter_val)) + ";"
         else:
-            query = "SELECT * FROM game WHERE " + filter_attr + " = " + str(filter_val) + ";"
+            query = ("SELECT game_id, team_1_id, team_2_id, start_time, start_day, start_month, start_year, duration, winner_team_id "
+                    "FROM game WHERE " + filter_attr + " = " + str(filter_val) + ";"
+            )
         retrieval_query(query)
 
-        game_id = int(input("Select game ID you want to view more information about (-1 to quit): "))
+        game_id = int(input("Select game ID you want to view more information about (-1 to go back, -2 to quit to menu): "))
         if game_id == -1:
-            return
+            return True
+        elif game_id == -2:
+            return False
         else:
             print("1. View teams")
             print("2. View players")
             print("3. Go back")
             choice = int(input("Select an option: "))
             if choice == 1:
-                listTeams("game_id", game_id)
+                no_quit = listTeams("game_id", game_id)
             elif choice == 2:
-                listPlayers("game_id", game_id)
+                no_quit = listPlayers("game_id", game_id)
 
 def listTeams(filter_attr = "", filter_val = -1):
-    while True:
-        print("Format: team_id, team_name")
+    no_quit = True
+    while no_quit:
         if filter_attr == "tournament_id":
-            query = "SELECT T.team_id, team_name FROM team T JOIN tournament_participant P ON T.team_id = P.team_id WHERE tournament_id = " + str(filter_val)
+            query = ("SELECT T.team_id, team_name, win_rate, games_played, result AS placement "
+            "FROM (SELECT * FROM team NATURAL JOIN team_win_rates) T NATURAL JOIN tournament_participant P WHERE tournament_id = " + str(filter_val)
+            + " ORDER BY win_rate DESC;"
+            )
         elif filter_attr == "game_id":
-            query = "SELECT team_id, team_name FROM team T JOIN game G ON T.team_id = G.team_1_id OR T.team_id = G.team_2_id WHERE game_id = " + str(filter_val)
+            query = ("SELECT T.team_id, team_name, win_rate, games_played, CASE WHEN team_id = winner_team_id THEN 'Winner' ELSE 'Loser' END AS game_result "
+            "FROM (SELECT * FROM team NATURAL JOIN team_win_rates) T JOIN game G ON T.team_id = G.team_1_id OR T.team_id = G.team_2_id WHERE game_id = " + str(filter_val)
+            + " ORDER BY win_rate DESC;"
+            )
         elif filter_attr == "player_id":
             team_id = retrieve_attr_val("player", filter_val, "team_id")
-            query = "SELECT * FROM team WHERE team_id =" + t_id
+            query = "SELECT team_id, team_name, win_rate, games_played FROM team NATURAL JOIN team_win_rates WHERE team_id =" + team_id + " ORDER BY win_rate DESC;"
         else:
             query = "SELECT * FROM team"
         retrieval_query(query)
 
-        team_id = int(input("Select team ID you want to view more information about (-1 to quit): "))
+        team_id = int(input("Select team ID you want to view more information about (-1 to go back, -2 to quit to menu): "))
         if team_id == -1:
-            return
+            return True
+        elif team_id == -2:
+            return False
         else:
             print("1. View games")
             print("2. View players")
@@ -660,27 +680,31 @@ def listTeams(filter_attr = "", filter_val = -1):
             choice = int(input("Select an option: "))
 
             if choice == 1:
-                listGames("team_id", team_id)
+                no_quit = listGames("team_id", team_id)
             elif choice == 2:
-                listPlayers("team_id", team_id)
+                no_quit = listPlayers("team_id", team_id)
             elif choice == 3:
-                listTournaments("team_id", team_id)
+                no_quit = listTournaments("team_id", team_id)
 
 def listPlayers(filter_attr = "", filter_val = -1):
-    while True:
-        print("Format: player_id, in_game_name, team_id, first_name, last_name, start_day, start_month, start_year")
+    no_quit = True
+    while no_quit:
         if filter_attr == "game_id":
             query = ("SELECT P.player_id, in_game_name, team_id, first_name, last_name, start_day, start_month, start_year "
-            "FROM player P JOIN game_participant G ON G.player_id = P.player_id WHERE game_id = " + str(filter_val))
+            "FROM (SELECT * FROM player NATURAL JOIN player_kill_death_ratio) P JOIN game_participant G ON G.player_id = P.player_id WHERE game_id = " + str(filter_val)
+            + " ORDER BY kill_death_ratio DESC;"
+            )
         elif filter_val != -1:
-            query = "SELECT * FROM player WHERE " + filter_attr + " = " + str(filter_val) + ";"
+            query = "SELECT * FROM player NATURAL JOIN player_kill_death_ratio WHERE " + filter_attr + " = " + str(filter_val) + " ORDER BY kill_death_ratio DESC;"
         else:
-            query = "SELECT * FROM player"
+            query = "SELECT * FROM player NATURAL JOIN player_kill_death_ratio ORDER BY kill_death_ratio DESC;"
         retrieval_query(query)
 
-        player_id = int(input("Select torunament ID you want to view more information about (-1 to quit): "))
+        player_id = int(input("Select player ID you want to view more information about (-1 to go back, -2 to quit to menu): "))
         if player_id == -1:
-            return
+            return True
+        elif player_id == -2:
+            return False
         else:
             print("1. View games")
             print("2. View teams")
@@ -688,9 +712,9 @@ def listPlayers(filter_attr = "", filter_val = -1):
             choice = int(input("Select an option: "))
 
             if choice == 1:
-                listGames("player_id", player_id)
+                no_quit = listGames("player_id", player_id)
             elif choice == 2:
-                listTeams("player_id", player_id)
+                no_quit = listTeams("player_id", player_id)
 
 # Create an infinite loop to show the menu and handle user input
 while True:
