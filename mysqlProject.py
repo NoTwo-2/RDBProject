@@ -14,6 +14,17 @@ mydb = mysql.connector.connect(
     database="esports"
 )
 
+
+def print_team_player_list(team_id):
+    query ="SELECT * FROM player WHERE team_id = "+str(team_id)+";"
+    mycursor = mydb.cursor()
+    mycursor.execute(query)
+    result = mycursor.fetchall()
+    # Print the result of the query
+    print("List of players: ")
+    for row in result:
+        print(row)
+
 ## === MODIFY FUNCTIONS === ##
 
 def modify_player():
