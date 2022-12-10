@@ -483,36 +483,22 @@ def viewMenu():
         os.system('clear') # Clear the screen
         print("=== View Menu ===")
         print("-----------------")
-        print("1. Tournaments")
-        print("2. Games")
-        print("3. Teams")
-        print("4. Sponsors")
-        print("5. Players")
-        print("6. Roster")
-        print("7. Back") 
+        print("1. List Tournaments")
+        print("2. List Teams")
+        print("3. List Players")
+        print("4. Back") 
         choice = int(input("Enter your choice(1-5): "))
         # Handle the user's choice
         if choice == 1:
-#            listTournaments() # List all tables
+            listTournaments()
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 2:
-            print("Not yet implemented.")
-#            gameMenu() # Describe a table
+            listTeams()
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 3:
-#            teamMenu() # Execute a query
+#            listPlayers()
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 4:
-#            sponsorMenu() # Execute a query
-            input("Press enter to continue...") # Wait for the user to press enter
-        elif choice == 5:
-            print("Not yet implemented.")
-#            playerMenu()
-            input("Press enter to continue...") # Wait for the user to press enter
-        elif choice == 6:
-            rosterMenu()
-            input("Press enter to continue...") # Wait for the user to press enter
-        elif choice == 7:
             return
 
 def listTournaments(filter_attr = "", filter_val = -1):
