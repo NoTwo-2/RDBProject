@@ -514,7 +514,30 @@ def viewMenu():
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 7:
             return
-            
+
+def listTournaments(filter_attr = "", filter_val = -1):
+    while True:
+        if filter_attr == "team_id":
+            query = ("SELECT tournament_name, start_day, start_month, start_year, street_address, city, state, result "
+                    "FROM tournament T JOIN tournament_participant P ON T.tournament_id = P.tournament_id WHERE team_id = " + str(filter_val))
+        else:
+            query = "SELECT * FROM tournament"
+        retrieval_query(query)
+
+        tourney_id = int(input("Select torunament ID you want to view more information about (-1 to quit): "))
+        if tourney_id == -1:
+            return
+        else:
+            print("1. View teams")
+            print("2. View games")
+            print("3. Go back")
+            choice = int(input("Select an option: "))
+
+            if(choice == 1):
+                listTeams("tournament_id", tourney_id)
+            elif(choice == 2):
+                listGames("tournament_id", tourney_id)
+
 def listTeams(filter_attr = "", filter_val = -1):
     while True:
         if filter_attr == "tournament_id":
@@ -531,37 +554,16 @@ def listTeams(filter_attr = "", filter_val = -1):
         else:
             print("1. View games")
             print("2. View players")
-            print("3. Go back")
+            print("3. List Tournaments")
+            print("4. Go back")
             choice = int(input("Select an option: "))
 
             if choice == 1:
                 listGames("team_id", team_id)
             elif choice == 2:
                 listPlayers("team_id", team_id)
-
-def listPlayers(filter_attr = "", filter_val = -1):
-    while True:
-        if filter_attr == "game_id":
-            thing
-        elif filter_val != -1:
-            query = "SELECT * FROM player WHERE " + filter_attr + " = " + str(filter_val) + ";"
-        else:
-            query = "SELECT * FROM player"
-        retrieval_query(query)
-
-        player_id = int(input("Select torunament ID you want to view more information about (-1 to quit): "))
-        if player_id == -1:
-            return
-        else:
-            print("1. View games")
-            print("2. View teams")
-            print("3. Go back")
-            choice = int(input("Select an option: "))
-
-            if choice == 1:
-                listGames("player_id", player_id)
-            elif choice == 2:
-                listTeams("player_id", player_id)
+            elif choice == 3:
+                listTournaments("team_id", team_id)
 
 # Create an infinite loop to show the menu and handle user input
 while True:
