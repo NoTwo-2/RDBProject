@@ -639,7 +639,7 @@ def listTeams(filter_attr = "", filter_val = -1):
             )
         elif filter_attr == "player_id":
             team_id = retrieve_attr_val("player", filter_val, "team_id")
-            query = "SELECT team_id, team_name, win_rate, games_played FROM team NATURAL JOIN team_win_rates WHERE team_id =" + team_id + " ORDER BY win_rate DESC;"
+            query = "SELECT team_id, team_name, win_rate, games_played FROM team NATURAL JOIN team_win_rates WHERE team_id =" + str(team_id) + " ORDER BY win_rate DESC;"
         else:
             query = "SELECT * FROM team"
         retrieval_query(query)
