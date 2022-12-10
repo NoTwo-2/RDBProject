@@ -177,6 +177,55 @@ def add_team_to_tournament():
             )
     data = (tournament_id, team_id)
     execute_query(query,True,data)
+    
+def add_game():
+    print("=== Add a game ===")
+    print_table('tournament')
+    tournament_id = int(input("Enter the tournament_id that you would like to add a game too "))
+    print_table('team')
+    team_id_1 = int(input('Enter the first team_id that should participate: '))
+    team_id_2 = int(input('Enter the second team_id that should participate: '))
+    query_team_1 = ("SELECT * FROM roster WHERE team_id = "+str(team_id_1)+ ';')
+    retrieval_query(query_team_1)
+    roster_team_1_id = int(input("Enter roster_id for team 1: "))
+    query_team_2 = ("SELECT * FROM roster WHERE team_id = " +str(team_id_2)+ ';')
+    retrieval_query(query_team_2)
+    roster_team_2_id = int(input("Enter roster_id for team 2: "))
+    start_time = int(input("Enter game start time(Military time): "))
+    start_day = int(input("Enter game start day: "))
+    start_month = int(input("Enter game start month: "))
+    start_year = int(input("Enter game start year: "))
+    finished_game = int(input('Game finished?.... Enter 1 for finished and 2 for not finished'))
+
+    if finished_game == 1:
+        query = (
+            "INSERT INTO game (tournament_id,team_1_id,team_2_id,team_1_roster_id,team_2_roster_id,start_time,start_day,start_month,start_year) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);"
+        )
+        data = (tournament_id,team_id_1,team_id_2,roster_team_1_id,roster_team_2_id,start_time,start_day,start_month,start_year)
+        execute_query(query,True,data)
+    else:
+        mycursor = mydb.cursor()
+        duration = int(input("Enter the duration of the game in hours "))
+        winner = input('Enter team_id that won the game : ')
+        query = (
+            "INSERT INTO game (tournament_id,team_1_id,team_2_id,team_1_roster_id,team_2_roster_id,start_time,start_day,start_month,start_year,duration,winner_team_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s , %s, %s);"
+        )
+        data = (tournament_id, team_id_1, team_id_2, roster_team_1_id, roster_team_2_id, start_time, start_day, start_month, start_year, duration, winner)
+        mycursor.execute(query,data)
+        game_id = mycursor.lastrowid
+
+
+        query = (
+            "SELECT player_id, in_game_name, team_name, first_name, last_name "
+            "FROM ("
+              "SELECT * FROM (SELECT * FROM roster WHERE roster_id = " + str(roster_team_1_id) + " OR roster_id = " + str(roster_team_2_id) + ") RL "
+              "NATURAL JOIN roster_member) R "
+            "NATURAL JOIN ("
+              "SELECT team_name, player_id, in_game_name, first_name, last_name "
+              "FROM player NATURAL JOIN team) P;"
+        )
+        mycursor.execute(query)
+        result = mycursor.fetchall()
 
 ## === DELETE FUNCTIONS === ##
 
@@ -357,7 +406,6 @@ def editMenu():
             tournamentMenu() # List all tables
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 2:
-            print("Not yet implemented.")
             gameMenu() # Describe a table
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 3:
