@@ -1,6 +1,6 @@
 import mysql.connector
 import os
-
+from secret import password
 
 # host      = localhost if the demo is running the MySQL DB on the local machine
 # otherwise, we will figure it out when the time comes
@@ -10,12 +10,12 @@ import os
 mydb = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="",
+    password=password,
     database="esports"
 )
 
 
-## === MODIFY FUNCTIONS === ##
+## =========================== MODIFY FUNCTIONS ============================== ##
 
 def modify_player():
     print_table('player')
@@ -73,7 +73,7 @@ def modify_tournament():
     data = (name, s_day, s_month, s_year, address, city, state, tournament_id)
     execute_query(query,True,data)
 
-## === ADD FUNCTIONS === ##
+## =========================== ADD FUNCTIONS =========================== ##
 def add_roster():
     mycursor = mydb.cursor()
     print("=== Create a roster===")
@@ -234,7 +234,7 @@ def add_game():
             data = (game_id,row[0],kills,deaths )
             execute_query(query_game_part,True,data)
 
-## === DELETE FUNCTIONS === ##
+## =========================== DELETE FUNCTIONS =========================== ##
 
 def delete_roster():
     print("=== Delete a roster ===")
@@ -271,7 +271,7 @@ def delete_tournament():
     query = ("DELETE FROM tournament WHERE tournament_id = " + str(tournament_id) + ";")
     execute_query(query,False)
 
-## === RETRIEVAL FUNCTIONS === ##
+## =========================== RETRIEVAL FUNCTIONS =========================== ##
 
 def print_table(table):
     query = ("SELECT * FROM " + table)
@@ -360,7 +360,7 @@ def retrieve_attr_val(table, tuple_id, attr_name):
     mycursor.execute("SELECT " + attr_name + " FROM " + table + " WHERE " + table + "_id = " + tuple_id + ";")
     return mycursor.fetchall()
         
-## === EDIT MENUS === ##
+## =========================== EDIT MENUS =========================== ##
 
 def mainMenu():
   os.system('clear') # Clear the screen
@@ -561,7 +561,7 @@ def gameMenu():
             return
 
 
-## === VIEW MENUS === ##
+## =========================== VIEW MENUS =========================== ##
 
 def viewMenu():
     while True:
