@@ -226,6 +226,13 @@ def add_game():
         )
         mycursor.execute(query)
         result = mycursor.fetchall()
+        for row in result:
+            print(row)
+            kills = int(input('Enter the number of kills today: '))
+            deaths = int(input('Enter the number of deaths today: '))
+            query_game_part = ("INSERT INTO game_participant (game_id,player_id,kills,deaths) VALUES (%s, %s, %s, %s)")
+            data = (game_id,row[0],kills,deaths )
+            execute_query(query_game_part,True,data)
 
 ## === DELETE FUNCTIONS === ##
 
