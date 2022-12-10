@@ -288,6 +288,12 @@ def execute_query(query,hasdata,data = ()):
     mydb.commit()
     tables = mycursor.fetchall()
 
+def retrieve_attr_val(table, tuple_id, attr_name):
+    mycursor = mydb.cursor()
+    if table in { "game", "player", "team", "tournament", "roster" }:
+        mycursor.execute("SELECT " + attr_name + " FROM " + table + " WHERE " + table + "_id = " + tuple_id + ";")
+        return mycursor.fetchall()
+
 ## === MENUS === ##
 
 def mainMenu():
