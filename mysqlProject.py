@@ -358,7 +358,7 @@ def editMenu():
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 2:
             print("Not yet implemented.")
-#            gameMenu() # Describe a table
+            gameMenu() # Describe a table
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 3:
             teamMenu() # Execute a query
@@ -481,6 +481,30 @@ def rosterMenu():
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 3:
             return
+
+def gameMenu():
+    while True:
+        os.system('clear') # Clear the screen
+        print("=== Game Menu ===")
+        print("-----------------")
+        print("1. Add a game")
+        print("2. Modify a game")
+        print("3. Delete a game")
+        print("4. Back") 
+        choice = int(input("Enter your choice(1-4): "))
+        # Handle the user's choice
+        if choice == 1:
+            add_game()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 2:
+            modify_game()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 3:
+            delete_game()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 4:
+            return
+
 
 ## === VIEW MENUS === ##
 
