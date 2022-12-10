@@ -11,4 +11,7 @@ Project members: Jacob, Hari, Nathan
 # Python requirements
 install python (optional: add it to the PATH variable)
 
+dependencies: mysql.connector, tabulate
+
 run ```python -m pip install mysql-connector-python``` in the directory that includes pip (not needed if python and python scripts are in PATH)
+run ```pip3 install tabulate``` in the directory that includes pip3
