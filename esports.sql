@@ -27,15 +27,15 @@ DROP TABLE IF EXISTS `game`;
 CREATE TABLE `game` (
   `game_id` int NOT NULL AUTO_INCREMENT,
   `tournament_id` int NOT NULL,
-  `team_1_id` int DEFAULT NULL,
-  `team_2_id` int DEFAULT NULL,
+  `team_1_id` int NOT NULL,
+  `team_2_id` int NOT NULL,
   `team_1_roster_id` int NOT NULL,
   `team_2_roster_id` int NOT NULL,
   `start_time` int NOT NULL,
   `start_day` int NOT NULL,
   `start_month` int NOT NULL,
   `start_year` int NOT NULL,
-  `duration` int NOT NULL COMMENT 'in minutes',
+  `duration` int DEFAULT NULL COMMENT 'in minutes',
   `winner_team_id` int DEFAULT NULL,
   PRIMARY KEY (`game_id`),
   UNIQUE KEY `game_id_UNIQUE` (`game_id`),
@@ -45,10 +45,10 @@ CREATE TABLE `game` (
   KEY `team_1_roster_id_idx` (`team_1_roster_id`),
   KEY `team_2_roster_id_idx` (`team_2_roster_id`),
   CONSTRAINT `game_tournament_id` FOREIGN KEY (`tournament_id`) REFERENCES `tournament` (`tournament_id`) ON DELETE CASCADE,
-  CONSTRAINT `team_1_id` FOREIGN KEY (`team_1_id`) REFERENCES `team` (`team_id`) ON DELETE SET NULL,
-  CONSTRAINT `team_1_roster_id` FOREIGN KEY (`team_1_roster_id`) REFERENCES `roster` (`roster_id`) ON DELETE CASCADE,
-  CONSTRAINT `team_2_id` FOREIGN KEY (`team_2_id`) REFERENCES `team` (`team_id`) ON DELETE SET NULL,
-  CONSTRAINT `team_2_roster_id` FOREIGN KEY (`team_2_roster_id`) REFERENCES `roster` (`roster_id`) ON DELETE CASCADE
+  CONSTRAINT `team_1_id` FOREIGN KEY (`team_1_id`) REFERENCES `team` (`team_id`) ON DELETE RESTRICT,
+  CONSTRAINT `team_1_roster_id` FOREIGN KEY (`team_1_roster_id`) REFERENCES `roster` (`roster_id`) ON DELETE RESTRICT,
+  CONSTRAINT `team_2_id` FOREIGN KEY (`team_2_id`) REFERENCES `team` (`team_id`) ON DELETE RESTRICT,
+  CONSTRAINT `team_2_roster_id` FOREIGN KEY (`team_2_roster_id`) REFERENCES `roster` (`roster_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -363,4 +363,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-12-08 21:54:23
+-- Dump completed on 2022-12-09 20:20:27
