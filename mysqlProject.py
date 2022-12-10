@@ -504,7 +504,7 @@ def viewMenu():
 def listTournaments(filter_attr = "", filter_val = -1):
     while True:
         if filter_attr == "team_id":
-            query = ("SELECT tournament_name, start_day, start_month, start_year, street_address, city, state, result "
+            query = ("SELECT T.tournament_id, tournament_name, start_day, start_month, start_year, street_address, city, state, result "
                     "FROM tournament T JOIN tournament_participant P ON T.tournament_id = P.tournament_id WHERE team_id = " + str(filter_val))
         else:
             query = "SELECT * FROM tournament"
@@ -527,14 +527,14 @@ def listTournaments(filter_attr = "", filter_val = -1):
 def listTeams(filter_attr = "", filter_val = -1):
     while True:
         if filter_attr == "tournament_id":
-            query = "SELECT team_id, team_name FROM team T JOIN tournament_participant P ON T.team_id = P.team_id WHERE tournament_id = " + str(filter_val)
+            query = "SELECT T.team_id, team_name FROM team T JOIN tournament_participant P ON T.team_id = P.team_id WHERE tournament_id = " + str(filter_val)
         elif filter_attr == "game_id":
             query = "SELECT team_id, team_name FROM team T JOIN game G ON T.team_id = G.team_1_id OR T.team_id = G.team_2_id WHERE game_id = " + str(filter_val)
         else:
             query = "SELECT * FROM team"
         retrieval_query(query)
 
-        team_id = int(input("Select torunament ID you want to view more information about (-1 to quit): "))
+        team_id = int(input("Select team ID you want to view more information about (-1 to quit): "))
         if team_id == -1:
             return
         else:
