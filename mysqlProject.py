@@ -15,16 +15,6 @@ mydb = mysql.connector.connect(
 )
 
 
-def print_team_player_list(team_id):
-    query ="SELECT * FROM player WHERE team_id = "+str(team_id)+";"
-    mycursor = mydb.cursor()
-    mycursor.execute(query)
-    result = mycursor.fetchall()
-    # Print the result of the query
-    print("List of players: ")
-    for row in result:
-        print(row)
-
 ## === MODIFY FUNCTIONS === ##
 
 def modify_player():
@@ -187,6 +177,62 @@ def add_team_to_tournament():
             )
     data = (tournament_id, team_id)
     execute_query(query,True,data)
+    
+def add_game():
+    print("=== Add a game ===")
+    print_table('tournament')
+    tournament_id = int(input("Enter the tournament_id that you would like to add a game too "))
+    print_table('team')
+    team_id_1 = int(input('Enter the first team_id that should participate: '))
+    team_id_2 = int(input('Enter the second team_id that should participate: '))
+    query_team_1 = ("SELECT * FROM roster WHERE team_id = "+str(team_id_1)+ ';')
+    retrieval_query(query_team_1)
+    roster_team_1_id = int(input("Enter roster_id for team 1: "))
+    query_team_2 = ("SELECT * FROM roster WHERE team_id = " +str(team_id_2)+ ';')
+    retrieval_query(query_team_2)
+    roster_team_2_id = int(input("Enter roster_id for team 2: "))
+    start_time = int(input("Enter game start time(Military time): "))
+    start_day = int(input("Enter game start day: "))
+    start_month = int(input("Enter game start month: "))
+    start_year = int(input("Enter game start year: "))
+    finished_game = int(input('Game finished?.... Enter 1 for finished and 2 for not finished'))
+
+    if finished_game == 1:
+        query = (
+            "INSERT INTO game (tournament_id,team_1_id,team_2_id,team_1_roster_id,team_2_roster_id,start_time,start_day,start_month,start_year) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);"
+        )
+        data = (tournament_id,team_id_1,team_id_2,roster_team_1_id,roster_team_2_id,start_time,start_day,start_month,start_year)
+        execute_query(query,True,data)
+    else:
+        mycursor = mydb.cursor()
+        duration = int(input("Enter the duration of the game in hours "))
+        winner = input('Enter team_id that won the game : ')
+        query = (
+            "INSERT INTO game (tournament_id,team_1_id,team_2_id,team_1_roster_id,team_2_roster_id,start_time,start_day,start_month,start_year,duration,winner_team_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s , %s, %s);"
+        )
+        data = (tournament_id, team_id_1, team_id_2, roster_team_1_id, roster_team_2_id, start_time, start_day, start_month, start_year, duration, winner)
+        mycursor.execute(query,data)
+        game_id = mycursor.lastrowid
+
+
+        query = (
+            "SELECT player_id, in_game_name, team_name, first_name, last_name "
+            "FROM ("
+              "SELECT * FROM (SELECT * FROM roster WHERE roster_id = " + str(roster_team_1_id) + " OR roster_id = " + str(roster_team_2_id) + ") RL "
+              "NATURAL JOIN roster_member) R "
+            "NATURAL JOIN ("
+              "SELECT team_name, player_id, in_game_name, first_name, last_name "
+              "FROM player NATURAL JOIN team) P;"
+        )
+        mycursor.execute(query)
+        result = mycursor.fetchall()
+        for row in result:
+            print(row)
+            kills = int(input('Enter the number of kills today: '))
+            deaths = int(input('Enter the number of deaths today: '))
+            query_game_part = ("INSERT INTO game_participant (game_id,player_id,kills,deaths) VALUES (%s, %s, %s, %s)")
+            data = (game_id,row[0],kills,deaths )
+            execute_query(query_game_part,True,data)
 
 ## === DELETE FUNCTIONS === ##
 
@@ -288,13 +334,33 @@ def execute_query(query,hasdata,data = ()):
     mydb.commit()
     tables = mycursor.fetchall()
 
-def retrieve_attr_val(table, tuple_id, attr_name):
+def retrieval_query(query):
     mycursor = mydb.cursor()
-    if table in { "game", "player", "team", "tournament", "roster" }:
-        mycursor.execute("SELECT " + attr_name + " FROM " + table + " WHERE " + table + "_id = " + tuple_id + ";")
-        return mycursor.fetchall()
+    mycursor.execute(query)
+    result = mycursor.fetchall()
 
-## === MENUS === ##
+    # Print the result of the query
+    print("Query Result:")
+    for row in result:
+        print(row)
+
+def print_team_player_list(team_id):
+    query ="SELECT * FROM player WHERE team_id = "+str(team_id)+";"
+    mycursor = mydb.cursor()
+    mycursor.execute(query)
+    result = mycursor.fetchall()
+    # Print the result of the query
+    print("List of players: ")
+    for row in result:
+        print(row)
+
+def retrieve_attr_val(table, tuple_id, attr_name):
+  mycursor = mydb.cursor()
+  if table in { "game", "player", "team", "tournament", "roster" }:
+    mycursor.execute("SELECT " + attr_name + " FROM " + table + " WHERE " + table + "_id = " + tuple_id + ";")
+    return mycursor.fetchall()
+        
+## === EDIT MENUS === ##
 
 def mainMenu():
   os.system('clear') # Clear the screen
@@ -347,8 +413,7 @@ def editMenu():
             tournamentMenu() # List all tables
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 2:
-            print("Not yet implemented.")
-#            gameMenu() # Describe a table
+            gameMenu() # Describe a table
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 3:
             teamMenu() # Execute a query
@@ -357,7 +422,6 @@ def editMenu():
             sponsorMenu() # Execute a query
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 5:
-            print("Not yet implemented.")
             playerMenu()
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 6:
@@ -473,6 +537,161 @@ def rosterMenu():
         elif choice == 3:
             return
 
+def gameMenu():
+    while True:
+        os.system('clear') # Clear the screen
+        print("=== Game Menu ===")
+        print("-----------------")
+        print("1. Add a game")
+        print("2. Modify a game")
+        print("3. Delete a game")
+        print("4. Back") 
+        choice = int(input("Enter your choice(1-4): "))
+        # Handle the user's choice
+        if choice == 1:
+            add_game()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 2:
+            modify_game()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 3:
+            delete_game()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 3:
+            return
+
+
+## === VIEW MENUS === ##
+
+def viewMenu():
+    while True:
+        os.system('clear') # Clear the screen
+        print("=== View Menu ===")
+        print("-----------------")
+        print("1. List Tournaments")
+        print("2. List Teams")
+        print("3. List Players")
+        print("4. Back") 
+        choice = int(input("Enter your choice(1-5): "))
+        # Handle the user's choice
+        if choice == 1:
+            listTournaments()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 2:
+            listTeams()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 3:
+            listPlayers()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 4:
+            return
+
+def listTournaments(filter_attr = "", filter_val = -1):
+    while True:
+        print("Format: tournament_id, tournament_name, start_day, start_month, start_year, street_address, city, state, result")
+        if filter_attr == "team_id":
+            query = ("SELECT T.tournament_id, tournament_name, start_day, start_month, start_year, street_address, city, state, result "
+                    "FROM tournament T JOIN tournament_participant P ON T.tournament_id = P.tournament_id WHERE team_id = " + str(filter_val))
+        else:
+            query = "SELECT * FROM tournament"
+        retrieval_query(query)
+
+        tourney_id = int(input("Select torunament ID you want to view more information about (-1 to quit): "))
+        if tourney_id == -1:
+            return
+        else:
+            print("1. View teams")
+            print("2. View games")
+            print("3. Go back")
+            choice = int(input("Select an option: "))
+
+            if(choice == 1):
+                listTeams("tournament_id", tourney_id)
+            elif(choice == 2):
+                listGames("tournament_id", tourney_id)
+                
+def listGames(filter_attr = "", filter_val = -1):
+    while True:
+        print("Format: game_id, tournament_id, team_1_id, team_2_id, team_1_roster_id, team_2_roster_id, start_time, start_day, start_month, start_year, duration, winner_team_id")
+        if filter_attr == "team_id":
+            query = "SELECT * FROM game WHERE team_1_id = " + str(filter_val) + " OR team_2_id = " + str(filter_val) + ";"
+        elif filter_attr == "player_id":
+            query = ("SELECT G.game_id, tournament_id, team_1_id, team_2_id, team_1_roster_id, team_2_roster_id, start_time, start_day, start_month, start_year, duration, winner_team_id "
+                    "FROM game G JOIN game_participant P ON G.game_id = P.game_id WHERE player_id =" + str(filter_val))
+        else:
+            query = "SELECT * FROM game WHERE " + filter_attr + " = " + str(filter_val) + ";"
+        retrieval_query(query)
+
+        game_id = int(input("Select game ID you want to view more information about (-1 to quit): "))
+        if game_id == -1:
+            return
+        else:
+            print("1. View teams")
+            print("2. View players")
+            print("3. Go back")
+            choice = int(input("Select an option: "))
+            if choice == 1:
+                listTeams("game_id", game_id)
+            elif choice == 2:
+                listPlayers("game_id", game_id)
+
+def listTeams(filter_attr = "", filter_val = -1):
+    while True:
+        print("Format: team_id, team_name")
+        if filter_attr == "tournament_id":
+            query = "SELECT T.team_id, team_name FROM team T JOIN tournament_participant P ON T.team_id = P.team_id WHERE tournament_id = " + str(filter_val)
+        elif filter_attr == "game_id":
+            query = "SELECT team_id, team_name FROM team T JOIN game G ON T.team_id = G.team_1_id OR T.team_id = G.team_2_id WHERE game_id = " + str(filter_val)
+        elif filter_attr == "player_id":
+            team_id = retrieve_attr_val("player", filter_val, "team_id")
+            query = "SELECT * FROM team WHERE team_id =" + t_id
+        else:
+            query = "SELECT * FROM team"
+        retrieval_query(query)
+
+        team_id = int(input("Select team ID you want to view more information about (-1 to quit): "))
+        if team_id == -1:
+            return
+        else:
+            print("1. View games")
+            print("2. View players")
+            print("3. List Tournaments")
+            print("4. Go back")
+            choice = int(input("Select an option: "))
+
+            if choice == 1:
+                listGames("team_id", team_id)
+            elif choice == 2:
+                listPlayers("team_id", team_id)
+            elif choice == 3:
+                listTournaments("team_id", team_id)
+
+def listPlayers(filter_attr = "", filter_val = -1):
+    while True:
+        print("Format: player_id, in_game_name, team_id, first_name, last_name, start_day, start_month, start_year")
+        if filter_attr == "game_id":
+            query = ("SELECT P.player_id, in_game_name, team_id, first_name, last_name, start_day, start_month, start_year "
+            "FROM player P JOIN game_participant G ON G.player_id = P.player_id WHERE game_id = " + str(filter_val))
+        elif filter_val != -1:
+            query = "SELECT * FROM player WHERE " + filter_attr + " = " + str(filter_val) + ";"
+        else:
+            query = "SELECT * FROM player"
+        retrieval_query(query)
+
+        player_id = int(input("Select torunament ID you want to view more information about (-1 to quit): "))
+        if player_id == -1:
+            return
+        else:
+            print("1. View games")
+            print("2. View teams")
+            print("3. Go back")
+            choice = int(input("Select an option: "))
+
+            if choice == 1:
+                listGames("player_id", player_id)
+            elif choice == 2:
+                listTeams("player_id", player_id)
+
 # Create an infinite loop to show the menu and handle user input
 while True:
   mainMenu()
@@ -483,13 +702,10 @@ while True:
     input("Press enter to continue...") # Wait for the user to press enter
   elif choice == 2:
     print("Not yet implemented.")
-#    viewMenu() # Describe a table
+    viewMenu() # Describe a table
     input("Press enter to continue...") # Wait for the user to press enter
   elif choice == 3:
     debug() # Execute a query
     input("Press enter to continue...") # Wait for the user to press enter
   elif choice == 4:
     break
-
-# TODO: add functions from the google doc
-# TODO: make all these functions user friendly. EX: on adding games, prompt the player for if they want to create a new roster, or use an existing one.
