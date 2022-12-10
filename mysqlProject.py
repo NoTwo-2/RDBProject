@@ -20,11 +20,11 @@ mydb = mysql.connector.connect(
 ## =========================== MODIFY FUNCTIONS ============================== ##
 
 def modify_player():
-    print_table('player')
+    retrieval_query("SELECT * FROM player")
     player_id = int(input('Select player_id to modify: '))
     print("=== Modify a player ===")
     in_game_name = input("Enter player in game name: ")
-    print_table('team')
+    retrieval_query("SELECT * FROM team")
     team_id = int(input('Select player team (-1 if no team) '))
     first_name = input("Enter player first name ")
     last_name = input("Enter player last name ")
@@ -46,7 +46,7 @@ def modify_player():
     execute_query(query,True,data)
 
 def modify_team():
-    print_table('team')
+    retrieval_query("SELECT * FROM team")
     team_id = int(input('Select team_id to modify: '))
     print("=== Modify a team ===")
     team_name = input("Enter team name: ")
@@ -58,7 +58,7 @@ def modify_team():
 
 def modify_tournament():
     #list the table
-    print_table('tournament')
+    retrieval_query("SELECT * FROM tournament")
     tournament_id = int(input('Select tournament_id to modify '))
     print("=== Modify a tournament ===")
     name = input("Enter tournament name: ")
@@ -79,9 +79,10 @@ def modify_tournament():
 def add_roster():
     mycursor = mydb.cursor()
     print("=== Create a roster===")
-    print_table('team')
+    retrieval_query("SELECT * FROM team")
     team_id = int(input("Enter team_id that you would like for your roster: "))
-    print_team_player_list(team_id)
+    query ="SELECT * FROM player WHERE team_id = "+str(team_id)+";"
+    retrieval_query(query)
     player_1_id = int(input("Enter player_id for the first player "))
     player_2_id = int(input("Enter player_id for the second player "))
     player_3_id = int(input("Enter player_id for the third player "))
@@ -111,7 +112,7 @@ def add_roster():
 def add_player():
     print("=== Add a player ===")
     in_game_name = input("Enter player in game name: ")
-    print_table('team')
+    retrieval_query("SELECT * FROM team")
     team_id = int(input('Select player team (-1 if no team) '))
     first_name = input("Enter player first name ")
     last_name = input("Enter player last name ")
@@ -135,7 +136,7 @@ def add_player():
 
 def add_sponsor():
     sponsor_name = input("Enter sponsor name: ")
-    print_table('team')
+    retrieval_query("SELECT * FROM team")
     sponsor_name_team_id = int(input("Enter the team_id that this sponsor is supporting: "))
     query = (
         "INSERT INTO sponsor(sponsor_name,sponsored_team_id) VALUES (%s, %s);"
@@ -169,9 +170,9 @@ def add_tournament():
 
 def add_team_to_tournament():
     print("=== Add a team to a tournament ===")
-    print_table('tournament')
+    retrieval_query("SELECT * FROM tournamnet")
     tournament_id = int(input('Select tournament_id to add a team to '))
-    print_table('team')
+    retrieval_query("SELECT * FROM team")
     team_id = int(input('Select team_id to add to the tournament '))
     query = (
             "INSERT INTO tournament_participant(tournament_id, team_id) "
@@ -182,9 +183,9 @@ def add_team_to_tournament():
     
 def add_game():
     print("=== Add a game ===")
-    print_table('tournament')
+    retrieval_query("SELECT * FROM tournamnet")
     tournament_id = int(input("Enter the tournament_id that you would like to add a game too "))
-    print_table('team')
+    retrieval_query("SELECT * FROM team")
     team_id_1 = int(input('Enter the first team_id that should participate: '))
     team_id_2 = int(input('Enter the second team_id that should participate: '))
     query_team_1 = ("SELECT * FROM roster WHERE team_id = "+str(team_id_1)+ ';')
@@ -240,13 +241,13 @@ def add_game():
 
 def delete_roster():
     print("=== Delete a roster ===")
-    print_table('roster')
+    retrieval_query("SELECT * FROM roster")
     roster_id = input("Enter your roster_id to be deleted: ")
     query = ("DELETE FROM roster WHERE roster_id = " + str(roster_id) + ";")
     execute_query(query, False)
 
 def delete_player():
-    print_table('player')
+    retrieval_query("SELECT * FROM player")
     player_id = int(input('Select player to delete: '))
     print("=== Delete a player ===")
     query = ("DELETE FROM player WHERE player_id = " + str(player_id) + ";")
@@ -254,37 +255,26 @@ def delete_player():
 
 def delete_sponsor():
     print("=== Delete a sponsor ===")
-    print_table('sponsor')
+    retrieval_query("SELECT * FROM sponsor")
     sponsor_team_id = input("Enter your sponsors team_id: ")
     query = ("DELETE FROM sponsor WHERE sponsored_team_id = " + str(sponsor_team_id) + ";")
     execute_query(query, False)
     
 def delete_team():
-    print_table('team')
+    retrieval_query("SELECT * FROM team")
     team_id = int(input('Select team_id to delete: '))
     print("=== Delete a team ===")
     query = ("DELETE FROM team WHERE team_id = " + str(team_id) + ";")
     execute_query(query, False)
 
 def delete_tournament():
-    print_table('tournament')
+    retrieval_query("SELECT * FROM tournament")
     print("=== Delete a tournament ===")
     tournament_id = int(input('Select tournament_id to delete '))
     query = ("DELETE FROM tournament WHERE tournament_id = " + str(tournament_id) + ";")
     execute_query(query,False)
 
 ## =========================== RETRIEVAL FUNCTIONS =========================== ##
-
-def print_table(table):
-    query = ("SELECT * FROM " + table)
-    mycursor = mydb.cursor()
-    mycursor.execute(query)
-    result = mycursor.fetchall()
-
-    # Print the result of the query
-    print("Tables in " + table + ":")
-    for row in result:
-        print(row)
 
 def list_tables():
     # Get a list of all tables in the database
@@ -315,10 +305,7 @@ def test_query():
     # Ask the user to enter the query to execute
     query = input("Enter the query to execute: ")
 
-    # Execute the query
-    mycursor = mydb.cursor()
-    mycursor.execute(query)
-    result = mycursor.fetchall()
+    result = execute_query(query,False)
 
     # Print the result of the query
     print("Query Result:")
@@ -335,6 +322,7 @@ def execute_query(query,hasdata,data = ()):
         mycursor.execute(query)
     mydb.commit()
     tables = mycursor.fetchall()
+    return tables
 
 def retrieval_query(query):
     mycursor = mydb.cursor()
@@ -348,17 +336,6 @@ def retrieval_query(query):
         name = string.capwords(name)
         header_list.append(name)
     print(tabulate(result, headers=header_list, tablefmt="github"))
-    
-
-def print_team_player_list(team_id):
-    query ="SELECT * FROM player WHERE team_id = "+str(team_id)+";"
-    mycursor = mydb.cursor()
-    mycursor.execute(query)
-    result = mycursor.fetchall()
-    # Print the result of the query
-    print("List of players: ")
-    for row in result:
-        print(row)
 
 def retrieve_attr_val(table, tuple_id, attr_name):
   mycursor = mydb.cursor()
