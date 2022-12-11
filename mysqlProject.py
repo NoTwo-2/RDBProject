@@ -70,8 +70,8 @@ def modify_tournament():
     city = input("Enter tournament city: ")
     address = input("Enter tournament street address: ")
     s_year = input("Enter tournament start year: ")
-    s_month = input("Enter tournament start month: ")
-    s_day = input("Enter tournament start day: ")
+    s_month = input("Enter tournament start month (numerical): ")
+    s_day = input("Enter tournament start day (numerical): ")
     query = (
         "UPDATE tournament SET tournament_name= %s, start_day= %s, start_month= %s, start_year= %s, street_address= %s, city= %s, state= %s "
         "WHERE tournament_id = %s;"
@@ -134,8 +134,8 @@ def modify_game(tournament_id):
             execute_query(query, False)
 
         start_time = int(input("Enter game start time (military time, no colon): "))
-        start_day = int(input("Enter game start day: "))
-        start_month = int(input("Enter game start month: "))
+        start_day = int(input("Enter the day of the month the game will start: "))
+        start_month = int(input("Enter game start month (numerical): "))
         start_year = int(input("Enter game start year: "))
 
         if complete_game != 1:
@@ -308,8 +308,8 @@ def add_game(tournament_id):
     retrieval_query(query_team_2)
     roster_team_2_id = int(input("Enter roster_id for team 2: "))
     start_time = int(input("Enter game start time (military time, no colon): "))
-    start_day = int(input("Enter game start day: "))
-    start_month = int(input("Enter game start month: "))
+    start_day = int(input("Enter day of the month the game will start: "))
+    start_month = int(input("Enter game start month (numerical): "))
     start_year = int(input("Enter game start year: "))
     finished_game = int(input('Enter 1 if this game has yet to be played or 2 if this game has already been played: '))
 
@@ -648,8 +648,8 @@ def viewMenu():
         print("=== View Menu ===")
         print("-----------------")
         print("1. List Tournaments")
-        print("2. List Teams")
-        print("3. List Players")
+        print("2. List Teams (sorted by win rate)")
+        print("3. List Players (sorted by kill/death ratio)")
         print("4. Back") 
         choice = int(input("Enter your choice: "))
         os.system('clear') # Clear the screen
