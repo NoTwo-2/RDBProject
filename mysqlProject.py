@@ -78,14 +78,15 @@ def modify_tournament():
 ## =========================== ADD FUNCTIONS =========================== ##
 def add_roster():
     mycursor = mydb.cursor()
-    print("=== Create a roster===")
+    print("=== Create a roster ===")
     retrieval_query("SELECT * FROM team")
-    team_id = int(input("Enter team_id that you would like for your roster: "))
+    team_id = int(input("Enter team_id of the team to make this roster for: "))
     query ="SELECT * FROM player WHERE team_id = "+str(team_id)+";"
     retrieval_query(query)
-    player_1_id = int(input("Enter player_id for the first player "))
-    player_2_id = int(input("Enter player_id for the second player "))
-    player_3_id = int(input("Enter player_id for the third player "))
+    print("Rosters are comprised of three players")
+    player_1_id = int(input("Enter player_id for the first player: "))
+    player_2_id = int(input("Enter player_id for the second player: "))
+    player_3_id = int(input("Enter player_id for the third player: "))
     query = (
         "INSERT INTO roster (team_id ) VALUES ("+str(team_id)+");"
     )
@@ -110,15 +111,15 @@ def add_roster():
     execute_query(player3_query, True, player3_data)
     
 def add_player():
-    print("=== Add a player ===")
-    in_game_name = input("Enter player in game name: ")
+    print("=== Add a new player ===")
+    in_game_name = input("Enter player's in game name: ")
     retrieval_query("SELECT * FROM team")
-    team_id = int(input('Select player team (-1 if no team) '))
-    first_name = input("Enter player first name ")
-    last_name = input("Enter player last name ")
-    start_year = input("Enter the players first year ")
-    start_month = input("Enter the players first month ")
-    start_day = input("Enter the players first day ")
+    team_id = int(input('Select player team (-1 if no team): '))
+    first_name = input("Enter the player's real first name: ")
+    last_name = input("Enter player last name: ")
+    start_year = input("Enter the year the player started playing professionally: ")
+    start_month = input("Enter the player's first month: ")
+    start_day = input("Enter the players first day: ")
     if team_id == -1:
         query = (
             "INSERT INTO player(in_game_name, first_name, last_name, start_day, start_month, start_year) "
@@ -135,9 +136,10 @@ def add_player():
     
 
 def add_sponsor():
-    sponsor_name = input("Enter sponsor name: ")
+    print("=== Add a sponsor ===")
     retrieval_query("SELECT * FROM team")
     sponsor_name_team_id = int(input("Enter the team_id that this sponsor is supporting: "))
+    sponsor_name = input("Enter sponsor name: ")
     query = (
         "INSERT INTO sponsor(sponsor_name,sponsored_team_id) VALUES (%s, %s);"
     )
@@ -155,12 +157,12 @@ def add_team():
 def add_tournament():
     print("=== Add a tournament ===")
     name = input("Enter tournament name: ")
-    state = input("Enter tournament state: ")
-    city = input("Enter tournament city: ")
-    address = input("Enter tournament street address: ")
+    s_day = input("Enter the day of the month the tournament starts: ")
+    s_month = input("Enter tournament start month (numerical): ")
     s_year = input("Enter tournament start year: ")
-    s_month = input("Enter tournament start month: ")
-    s_day = input("Enter tournament start day: ")
+    address = input("Enter the street address of the venue the tournament will take place at: ")
+    city = input("Enter tournament city: ")
+    state = input("Enter tournament state (two leter abbreviation): ")
     query = (
             "INSERT INTO tournament(tournament_name, start_day, start_month, start_year, street_address, city, state) "
              "VALUES (%s, %s, %s, %s, %s, %s ,%s);"
@@ -180,11 +182,12 @@ def add_team_to_tournament():
             )
     data = (tournament_id, team_id)
     execute_query(query,True,data)
-    
+
+# TODO: select tournament before calling add_game
 def add_game():
     print("=== Add a game ===")
-    retrieval_query("SELECT * FROM tournamnet")
-    tournament_id = int(input("Enter the tournament_id that you would like to add a game too "))
+    retrieval_query("SELECT * FROM tournament")
+    tournament_id = int(input("Enter the tournament_id that you would like to add a game to: "))
     retrieval_query("SELECT * FROM team")
     team_id_1 = int(input('Enter the first team_id that should participate: '))
     team_id_2 = int(input('Enter the second team_id that should participate: '))
@@ -194,11 +197,11 @@ def add_game():
     query_team_2 = ("SELECT * FROM roster WHERE team_id = " +str(team_id_2)+ ';')
     retrieval_query(query_team_2)
     roster_team_2_id = int(input("Enter roster_id for team 2: "))
-    start_time = int(input("Enter game start time(Military time): "))
+    start_time = int(input("Enter game start time (military time, no colon): "))
     start_day = int(input("Enter game start day: "))
     start_month = int(input("Enter game start month: "))
     start_year = int(input("Enter game start year: "))
-    finished_game = int(input('Game finished?.... Enter 1 for finished and 2 for not finished'))
+    finished_game = int(input('Enter 1 if this game has yet to be played or 2 if this game has already been played: '))
 
     if finished_game == 1:
         query = (
@@ -208,8 +211,10 @@ def add_game():
         execute_query(query,True,data)
     else:
         mycursor = mydb.cursor()
-        duration = int(input("Enter the duration of the game in hours "))
-        winner = input('Enter team_id that won the game : ')
+        duration = int(input("Enter the duration of the game in minutes: "))
+        query = ("SELECT team_id, team_name FROM team WHERE team_id = " + str(team_id_1) + " OR team_id = " + str(team_id_2) + ";")
+        retrieval_query(query)
+        winner = input('Enter team_id of the team that won the game: ')
         query = (
             "INSERT INTO game (tournament_id,team_1_id,team_2_id,team_1_roster_id,team_2_roster_id,start_time,start_day,start_month,start_year,duration,winner_team_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s , %s, %s);"
         )
@@ -229,8 +234,15 @@ def add_game():
         )
         mycursor.execute(query)
         result = mycursor.fetchall()
+        column_names = mycursor.column_names
+        header_list = []
+        # Print the result of the query
+        for name in column_names:
+            name = name.replace('_', ' ')
+            name = string.capwords(name)
+            header_list.append(name)
         for row in result:
-            print(row)
+            print(tabulate([row], headers=header_list, tablefmt="github"))
             kills = int(input('Enter the number of kills today: '))
             deaths = int(input('Enter the number of deaths today: '))
             query_game_part = ("INSERT INTO game_participant (game_id,player_id,kills,deaths) VALUES (%s, %s, %s, %s)")
@@ -346,6 +358,7 @@ def retrieve_attr_val(table, tuple_id, attr_name):
         
 ## =========================== EDIT MENUS =========================== ##
 
+# TODO: Print the tables and their entries that you are going to be editing.
 def mainMenu():
   os.system('clear') # Clear the screen
   print("=== Main Menu ===")
