@@ -673,7 +673,7 @@ def listTournaments(filter_attr = "", filter_val = -1):
             query = "SELECT * FROM tournament"
         retrieval_query(query)
 
-        tourney_id = int(input("Select torunament ID you want to view more information about (-1 to go back, -2 to quit to menu): "))
+        tourney_id = int(input("Select tournament ID you want to view more information about (-1 to go back, -2 to quit to menu): "))
         if tourney_id == -1:
             return True
         elif tourney_id == -2:
