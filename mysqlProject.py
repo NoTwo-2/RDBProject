@@ -355,6 +355,35 @@ def delete_sponsor():
 
 ## =========================== RETRIEVAL FUNCTIONS =========================== ##
 
+def get_value(message, integer=False, constraints=[]):
+    valid = False
+    sql_substrings = [
+        ';', ')', '(', ','
+    ]
+
+    while not valid:
+        if integer:
+            result = int(input(message))
+        else:
+            result = input(message)
+        # put all new constraints here
+        condition_list = [
+            integer and result < 0,
+            
+            "TIME" in constraints and result > 2400,
+            "STATE" in constraints and len(result) > 2,
+
+        ]
+        for ss in sql_substrings : condition_list.append(ss in str(result))
+
+        if False in condition_list:
+            print("Invalid input, please try again (ctrl+C to quit the program)")
+        else:
+            valid = True
+
+
+    return result
+
 def list_tables():
     # Get a list of all tables in the database
     mycursor = mydb.cursor()
@@ -454,7 +483,7 @@ def debug():
         elif choice == 3:
             test_query() # Execute a query
             input("Press enter to continue...") # Wait for the user to press enter
-        elif choice == 4:
+        else:
             return
 
 def editMenu():
@@ -489,7 +518,7 @@ def editMenu():
         elif choice == 6:
             rosterMenu()
             input("Press enter to continue...") # Wait for the user to press enter
-        elif choice == 7:
+        else:
             return
 
 def tournamentMenu():
@@ -513,7 +542,7 @@ def tournamentMenu():
         elif choice == 3:
             delete_item("tournament")
             input("Press enter to continue...") # Wait for the user to press enter
-        elif choice == 4:
+        else:
             return
 
 def teamMenu():
@@ -537,7 +566,7 @@ def teamMenu():
         elif choice == 3:
             delete_item("team")
             input("Press enter to continue...") # Wait for the user to press enter
-        elif choice == 4:
+        else:
             return
 
 def sponsorMenu():
@@ -557,7 +586,7 @@ def sponsorMenu():
         elif choice == 2:
             delete_sponsor()
             input("Press enter to continue...") # Wait for the user to press enter
-        elif choice == 3:
+        else:
             return
 
 def playerMenu():
@@ -581,7 +610,7 @@ def playerMenu():
         elif choice == 3:
             delete_item("player")
             input("Press enter to continue...") # Wait for the user to press enter
-        elif choice == 4:
+        else:
             return
 
 def rosterMenu():
@@ -600,7 +629,7 @@ def rosterMenu():
         elif choice == 2:
             delete_item("roster")
             input("Press enter to continue...") # Wait for the user to press enter
-        elif choice == 3:
+        else:
             return
 
 def gameMenu():
@@ -627,7 +656,7 @@ def gameMenu():
         elif choice == 4:
             delete_item("game")
             input("Press enter to continue...") # Wait for the user to press enter
-        elif choice == 5:
+        else:
             return
 
 
@@ -651,7 +680,7 @@ def viewMenu():
             listTeams()
         elif choice == 3:
             listPlayers()
-        elif choice == 4:
+        else:
             return
 
 def listTournaments(filter_attr = "", filter_val = -1):
@@ -679,6 +708,8 @@ def listTournaments(filter_attr = "", filter_val = -1):
                 no_quit = listTeams("tournament_id", tourney_id)
             elif(choice == 2):
                 no_quit = listGames("tournament_id", tourney_id)
+            else:
+                print("Invalid choice")
                 
 def listGames(filter_attr = "", filter_val = -1):
     no_quit = True
@@ -710,6 +741,8 @@ def listGames(filter_attr = "", filter_val = -1):
                 no_quit = listTeams("game_id", game_id)
             elif choice == 2:
                 no_quit = listPlayers("game_id", game_id)
+            else:
+                print("Invalid choice")
 
 def listTeams(filter_attr = "", filter_val = -1):
     no_quit = True
@@ -749,6 +782,8 @@ def listTeams(filter_attr = "", filter_val = -1):
                 no_quit = listPlayers("team_id", team_id)
             elif choice == 3:
                 no_quit = listTournaments("team_id", team_id)
+            else:
+                print("Invalid choice")
 
 def listPlayers(filter_attr = "", filter_val = -1):
     no_quit = True
@@ -779,6 +814,8 @@ def listPlayers(filter_attr = "", filter_val = -1):
                 no_quit = listGames("player_id", player_id)
             elif choice == 2:
                 no_quit = listTeams("player_id", player_id)
+            else:
+                print("Invalid choice")
 
 # Create an infinite loop to show the menu and handle user input
 while True:
@@ -797,3 +834,5 @@ while True:
     input("Press enter to continue...") # Wait for the user to press enter
   elif choice == 4:
     break
+  else:
+    print("Invalid choice")
