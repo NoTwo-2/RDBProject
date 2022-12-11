@@ -16,14 +16,16 @@ mydb = mysql.connector.connect(
     database="esports"
 )
 
+# TODO: add function to check for valid entries
 
 ## =========================== MODIFY FUNCTIONS ============================== ##
 
-# TODO: print the current values of the item youre editing
 def modify_player():
+    print("=== Modify a player ===")
     retrieval_query("SELECT * FROM player")
     player_id = int(input('Select player_id to modify: '))
-    print("=== Modify a player ===")
+    print("=== Current values ===")
+    retrieval_query("SELECT * FROM player WHERE player_id = " + str(player_id) + ";")
     in_game_name = input("Enter player in game name: ")
     retrieval_query("SELECT * FROM team")
     team_id = int(input('Select player team (-1 if no team) '))
@@ -58,10 +60,11 @@ def modify_team():
     execute_query(query,True,data)
 
 def modify_tournament():
-    #list the table
+    print("=== Modify a tournament ===")
     retrieval_query("SELECT * FROM tournament")
     tournament_id = int(input('Select tournament_id to modify '))
-    print("=== Modify a tournament ===")
+    print("=== Current values ===")
+    retrieval_query("SELECT * FROM tournament WHERE tournament_id = " + str(tournament_id) + ";")
     name = input("Enter tournament name: ")
     state = input("Enter tournament state: ")
     city = input("Enter tournament city: ")
@@ -294,7 +297,6 @@ def add_team_to_tournament():
     data = (tournament_id, team_id)
     execute_query(query,True,data)
 
-# TODO: select tournament before calling add_game
 def add_game():
     print("=== Add a game ===")
     retrieval_query("SELECT * FROM tournament")
