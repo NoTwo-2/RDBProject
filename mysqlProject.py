@@ -339,19 +339,11 @@ def add_game():
 
 ## =========================== DELETE FUNCTIONS =========================== ##
 
-# TODO: consolidate delete functions
-def delete_roster():
-    print("=== Delete a roster ===")
-    retrieval_query("SELECT * FROM roster")
-    roster_id = input("Enter your roster_id to be deleted: ")
-    query = ("DELETE FROM roster WHERE roster_id = " + str(roster_id) + ";")
-    execute_query(query, False)
-
-def delete_player():
-    retrieval_query("SELECT * FROM player")
-    player_id = int(input('Select player to delete: '))
-    print("=== Delete a player ===")
-    query = ("DELETE FROM player WHERE player_id = " + str(player_id) + ";")
+def delete_item(table_name):
+    print("=== Delete a", table_name, "===")
+    retrieval_query("SELECT * FROM " + table_name)
+    id = input("Enter the id of the item you would like to delete: ")
+    query = ("DELETE FROM " + table_name + " WHERE " + table_name + "_id = " + str(id) + ";")
     execute_query(query, False)
 
 def delete_sponsor():
@@ -360,20 +352,6 @@ def delete_sponsor():
     sponsor_team_id = input("Enter your sponsors team_id: ")
     query = ("DELETE FROM sponsor WHERE sponsored_team_id = " + str(sponsor_team_id) + ";")
     execute_query(query, False)
-    
-def delete_team():
-    retrieval_query("SELECT * FROM team")
-    team_id = int(input('Select team_id to delete: '))
-    print("=== Delete a team ===")
-    query = ("DELETE FROM team WHERE team_id = " + str(team_id) + ";")
-    execute_query(query, False)
-
-def delete_tournament():
-    retrieval_query("SELECT * FROM tournament")
-    print("=== Delete a tournament ===")
-    tournament_id = int(input('Select tournament_id to delete '))
-    query = ("DELETE FROM tournament WHERE tournament_id = " + str(tournament_id) + ";")
-    execute_query(query,False)
 
 ## =========================== RETRIEVAL FUNCTIONS =========================== ##
 
@@ -533,7 +511,7 @@ def tournamentMenu():
             modify_tournament()
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 3:
-            delete_tournament()
+            delete_item("tournament")
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 4:
             return
@@ -557,7 +535,7 @@ def teamMenu():
             modify_team()
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 3:
-            delete_team()
+            delete_item("team")
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 4:
             return
@@ -601,7 +579,7 @@ def playerMenu():
             modify_player()
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 3:
-            delete_player()
+            delete_item("player")
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 4:
             return
@@ -620,7 +598,7 @@ def rosterMenu():
             add_roster()
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 2:
-            delete_roster()
+            delete_item("roster")
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 3:
             return
@@ -647,7 +625,7 @@ def gameMenu():
             modify_game()
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 4:
-            delete_game()
+            delete_item("game")
             input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 5:
             return
