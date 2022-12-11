@@ -341,7 +341,8 @@ def retrieve_attr_val(table, tuple_id, attr_name):
   mycursor = mydb.cursor()
   if table in { "game", "player", "team", "tournament", "roster" }:
     mycursor.execute("SELECT " + attr_name + " FROM " + table + " WHERE " + table + "_id = " + str(tuple_id) + ";")
-    return mycursor.fetchall()
+    result = mycursor.fetchall()
+    return result[0][0]
         
 ## =========================== EDIT MENUS =========================== ##
 
