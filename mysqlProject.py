@@ -19,6 +19,7 @@ mydb = mysql.connector.connect(
 
 ## =========================== MODIFY FUNCTIONS ============================== ##
 
+# TODO: print the current values of the item youre editing
 def modify_player():
     retrieval_query("SELECT * FROM player")
     player_id = int(input('Select player_id to modify: '))
@@ -75,7 +76,117 @@ def modify_tournament():
     data = (name, s_day, s_month, s_year, address, city, state, tournament_id)
     execute_query(query,True,data)
 
+def complete_game():
+    retrieval_query("SELECT * FROM tournament")
+    tournament_id = int(input("Enter a tournament_id to view unfinished games: "))
+    print("=== Complete an unfinished game ===")
+    retrieval_query("SELECT * FROM game WHERE tournament_id = " + str(tournament_id) + " AND winner_team_id IS NULL;")
+    game_id = int(input("Enter the game_id of the game you would like to complete: "))
+
+    mycursor = mydb.cursor()
+    duration = int(input("Enter the duration of the game in minutes: "))
+    query = ("SELECT team_id, team_name FROM team JOIN game ON team_id = team_1_id OR team_id = team_id_2 WHERE game_id = " + str(game_id) + ";")
+    retrieval_query(query)
+    winner = input('Enter team_id of the team that won the game: ')
+    query = (
+        "INSERT INTO game (duration,winner_team_id) "
+        "VALUES (%s, %s);"
+    )
+    data = (duration, winner)
+    mycursor.execute(query,data)
+    roster_team_1_id = retrieve_attr_val("game", game_id, "team_1_roster_id")
+    roster_team_2_id = retrieve_attr_val("game", game_id, "team_2_roster_id")
+
+    add_game_participants(game_id, roster_team_1_id, roster_team_2_id)
+
+
+def modify_game():
+    print("=== Modify a game ===")
+    retrieval_query("SELECT * FROM tournament")
+    tournament_id = int(input("Enter a tournament_id to view games to modify: "))
+
+    complete_game = int(input("Enter 1 if you would like to modify a completed game, 2 if you want to modify an incomplete game: "))
+    if complete_game == 1:
+        retrieval_query("SELECT * FROM game WHERE tournament_id = " + str(tournament_id) + " AND winner_team_id IS NOT NULL;")
+    else:
+        retrieval_query("SELECT * FROM game WHERE tournament_id = " + str(tournament_id) + " AND winner_team_id IS NULL;")
+    game_id = int(input("Enter the game_id of the game you would like to modify: "))
+    print("=== Current values ===")
+    retrieval_query("SELECT * FROM game WHERE game_id = " + str(game_id) + ";")
+
+    old_roster_ids = (retrieve_attr_val("game_id", game_id, "team_1_roster_id"), retrieve_attr_val("game_id", game_id, "team_2_roster_id"))
+    retrieval_query("SELECT * FROM team")
+    team_id_1 = int(input('Enter the first team_id that should participate: '))
+    team_id_2 = int(input('Enter the second team_id that should participate: '))
+    query_team_1 = ("SELECT * FROM roster WHERE team_id = "+str(team_id_1)+ ';')
+    retrieval_query(query_team_1)
+    roster_team_1_id = int(input("Enter roster_id for team 1: "))
+    query_team_2 = ("SELECT * FROM roster WHERE team_id = " +str(team_id_2)+ ';')
+    retrieval_query(query_team_2)
+    roster_team_2_id = int(input("Enter roster_id for team 2: "))
+
+    if not (roster_team_1_id in old_roster_ids) or not (roster_team_2_id in old_roster_ids):
+        query = "DELETE FROM game_participant WHERE game_id = " + str(game_id) + ";"
+        execute_query(query, False)
+
+    start_time = int(input("Enter game start time (military time, no colon): "))
+    start_day = int(input("Enter game start day: "))
+    start_month = int(input("Enter game start month: "))
+    start_year = int(input("Enter game start year: "))
+
+    if complete_game != 1:
+        query = (
+            "INSERT INTO game (tournament_id,team_1_id,team_2_id,team_1_roster_id,team_2_roster_id,start_time,start_day,start_month,start_year,duration,winner_team_id) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s , %s, %s);"
+        )
+        data = (tournament_id,team_id_1,team_id_2,roster_team_1_id,roster_team_2_id,start_time,start_day,start_month,start_year)
+        execute_query(query,True,data)
+    else:
+        mycursor = mydb.cursor()
+        duration = int(input("Enter the duration of the game in minutes: "))
+        query = ("SELECT team_id, team_name FROM team WHERE team_id = " + str(team_id_1) + " OR team_id = " + str(team_id_2) + ";")
+        retrieval_query(query)
+        winner = input('Enter team_id of the team that won the game: ')
+        query = (
+            "INSERT INTO game (tournament_id,team_1_id,team_2_id,team_1_roster_id,team_2_roster_id,start_time,start_day,start_month,start_year,duration,winner_team_id) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s , %s, %s);"
+        )
+        data = (tournament_id, team_id_1, team_id_2, roster_team_1_id, roster_team_2_id, start_time, start_day, start_month, start_year, duration, winner)
+        mycursor.execute(query,data)
+        game_id = mycursor.lastrowid
+
+
+        add_game_participants(game_id, roster_team_1_id, roster_team_2_id)
+
 ## =========================== ADD FUNCTIONS =========================== ##
+def add_game_participants(game_id, team_1_roster_id, team_2_roster_id):
+    mycursor = mydb.cursor()
+    query = (
+        "SELECT player_id, in_game_name, team_name, first_name, last_name "
+        "FROM ("
+            "SELECT * FROM (SELECT * FROM roster WHERE roster_id = " + str(team_1_roster_id) + " OR roster_id = " + str(team_2_roster_id) + ") RL "
+            "NATURAL JOIN roster_member) R "
+        "NATURAL JOIN ("
+            "SELECT team_name, player_id, in_game_name, first_name, last_name "
+            "FROM player NATURAL JOIN team) P;"
+    )
+    mycursor.execute(query)
+    result = mycursor.fetchall()
+    column_names = mycursor.column_names
+    header_list = []
+    # Print the result of the query
+    for name in column_names:
+        name = name.replace('_', ' ')
+        name = string.capwords(name)
+        header_list.append(name)
+    for row in result:
+        print(tabulate([row], headers=header_list, tablefmt="github"))
+        kills = int(input('Enter the number of kills the player got this game: '))
+        deaths = int(input('Enter the number of deaths today the player got this game: '))
+        query_game_part = ("INSERT INTO game_participant (game_id,player_id,kills,deaths) VALUES (%s, %s, %s, %s)")
+        data = (game_id,row[0],kills,deaths )
+        execute_query(query_game_part,True,data)
+
 def add_roster():
     mycursor = mydb.cursor()
     print("=== Create a roster ===")
@@ -222,35 +333,11 @@ def add_game():
         mycursor.execute(query,data)
         game_id = mycursor.lastrowid
 
-
-        query = (
-            "SELECT player_id, in_game_name, team_name, first_name, last_name "
-            "FROM ("
-              "SELECT * FROM (SELECT * FROM roster WHERE roster_id = " + str(roster_team_1_id) + " OR roster_id = " + str(roster_team_2_id) + ") RL "
-              "NATURAL JOIN roster_member) R "
-            "NATURAL JOIN ("
-              "SELECT team_name, player_id, in_game_name, first_name, last_name "
-              "FROM player NATURAL JOIN team) P;"
-        )
-        mycursor.execute(query)
-        result = mycursor.fetchall()
-        column_names = mycursor.column_names
-        header_list = []
-        # Print the result of the query
-        for name in column_names:
-            name = name.replace('_', ' ')
-            name = string.capwords(name)
-            header_list.append(name)
-        for row in result:
-            print(tabulate([row], headers=header_list, tablefmt="github"))
-            kills = int(input('Enter the number of kills today: '))
-            deaths = int(input('Enter the number of deaths today: '))
-            query_game_part = ("INSERT INTO game_participant (game_id,player_id,kills,deaths) VALUES (%s, %s, %s, %s)")
-            data = (game_id,row[0],kills,deaths )
-            execute_query(query_game_part,True,data)
+        add_game_participants(game_id, roster_team_1_id, roster_team_2_id)
 
 ## =========================== DELETE FUNCTIONS =========================== ##
 
+# TODO: consolidate delete functions
 def delete_roster():
     print("=== Delete a roster ===")
     retrieval_query("SELECT * FROM roster")
@@ -540,21 +627,25 @@ def gameMenu():
         print("=== Game Menu ===")
         print("-----------------")
         print("1. Add a game")
-        print("2. Modify a game")
-        print("3. Delete a game")
-        print("4. Back") 
+        print("2. Finish an incomplete game")
+        print("3. Modify a game")
+        print("4. Delete a game")
+        print("5. Back") 
         choice = int(input("Enter your choice(1-4): "))
         # Handle the user's choice
         if choice == 1:
             add_game()
             input("Press enter to continue...") # Wait for the user to press enter
-        elif choice == 2:
+        if choice == 2:
+            complete_game()
+            input("Press enter to continue...") # Wait for the user to press enter
+        elif choice == 3:
             modify_game()
             input("Press enter to continue...") # Wait for the user to press enter
-        elif choice == 3:
+        elif choice == 4:
             delete_game()
             input("Press enter to continue...") # Wait for the user to press enter
-        elif choice == 3:
+        elif choice == 5:
             return
 
 
