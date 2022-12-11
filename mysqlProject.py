@@ -447,7 +447,6 @@ def retrieve_attr_val(table, tuple_id, attr_name):
         
 ## =========================== EDIT MENUS =========================== ##
 
-# TODO: Print the tables and their entries that you are going to be editing.
 def mainMenu():
   os.system('clear') # Clear the screen
   print("=== Main Menu ===")
@@ -480,7 +479,6 @@ def debug():
         elif choice == 4:
             return
 
-# TODO: add function add_team_to_tournament to a menu that makes sense
 def editMenu():
     while True:
         os.system('clear') # Clear the screen
