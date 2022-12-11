@@ -79,87 +79,88 @@ def modify_tournament():
     data = (name, s_day, s_month, s_year, address, city, state, tournament_id)
     execute_query(query,True,data)
 
-def complete_game():
-    retrieval_query("SELECT * FROM tournament")
-    tournament_id = int(input("Enter a tournament_id to view unfinished games: "))
+def complete_game(tournament_id):
     print("=== Complete an unfinished game ===")
-    retrieval_query("SELECT * FROM game WHERE tournament_id = " + str(tournament_id) + " AND winner_team_id IS NULL;")
-    game_id = int(input("Enter the game_id of the game you would like to complete: "))
-
-    mycursor = mydb.cursor()
-    duration = int(input("Enter the duration of the game in minutes: "))
-    query = ("SELECT team_id, team_name FROM team JOIN game ON team_id = team_1_id OR team_id = team_id_2 WHERE game_id = " + str(game_id) + ";")
-    retrieval_query(query)
-    winner = input('Enter team_id of the team that won the game: ')
-    query = (
-        "INSERT INTO game (duration,winner_team_id) "
-        "VALUES (%s, %s);"
-    )
-    data = (duration, winner)
-    mycursor.execute(query,data)
-    roster_team_1_id = retrieve_attr_val("game", game_id, "team_1_roster_id")
-    roster_team_2_id = retrieve_attr_val("game", game_id, "team_2_roster_id")
-
-    add_game_participants(game_id, roster_team_1_id, roster_team_2_id)
-
-
-def modify_game():
-    print("=== Modify a game ===")
-    retrieval_query("SELECT * FROM tournament")
-    tournament_id = int(input("Enter a tournament_id to view games to modify: "))
-
-    complete_game = int(input("Enter 1 if you would like to modify a completed game, 2 if you want to modify an incomplete game: "))
-    if complete_game == 1:
-        retrieval_query("SELECT * FROM game WHERE tournament_id = " + str(tournament_id) + " AND winner_team_id IS NOT NULL;")
+    not_empty = retrieval_query("SELECT * FROM game WHERE tournament_id = " + str(tournament_id) + " AND winner_team_id IS NULL;")
+    if not not_empty:
+        input("This table is empty!")
     else:
-        retrieval_query("SELECT * FROM game WHERE tournament_id = " + str(tournament_id) + " AND winner_team_id IS NULL;")
-    game_id = int(input("Enter the game_id of the game you would like to modify: "))
-    print("=== Current values ===")
-    retrieval_query("SELECT * FROM game WHERE game_id = " + str(game_id) + ";")
+        game_id = int(input("Enter the game_id of the game you would like to complete: "))
 
-    old_roster_ids = (retrieve_attr_val("game_id", game_id, "team_1_roster_id"), retrieve_attr_val("game_id", game_id, "team_2_roster_id"))
-    retrieval_query("SELECT * FROM team")
-    team_id_1 = int(input('Enter the first team_id that should participate: '))
-    team_id_2 = int(input('Enter the second team_id that should participate: '))
-    query_team_1 = ("SELECT * FROM roster WHERE team_id = "+str(team_id_1)+ ';')
-    retrieval_query(query_team_1)
-    roster_team_1_id = int(input("Enter roster_id for team 1: "))
-    query_team_2 = ("SELECT * FROM roster WHERE team_id = " +str(team_id_2)+ ';')
-    retrieval_query(query_team_2)
-    roster_team_2_id = int(input("Enter roster_id for team 2: "))
-
-    if not (roster_team_1_id in old_roster_ids) or not (roster_team_2_id in old_roster_ids):
-        query = "DELETE FROM game_participant WHERE game_id = " + str(game_id) + ";"
-        execute_query(query, False)
-
-    start_time = int(input("Enter game start time (military time, no colon): "))
-    start_day = int(input("Enter game start day: "))
-    start_month = int(input("Enter game start month: "))
-    start_year = int(input("Enter game start year: "))
-
-    if complete_game != 1:
-        query = (
-            "INSERT INTO game (tournament_id,team_1_id,team_2_id,team_1_roster_id,team_2_roster_id,start_time,start_day,start_month,start_year,duration,winner_team_id) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s , %s, %s);"
-        )
-        data = (tournament_id,team_id_1,team_id_2,roster_team_1_id,roster_team_2_id,start_time,start_day,start_month,start_year)
-        execute_query(query,True,data)
-    else:
         mycursor = mydb.cursor()
         duration = int(input("Enter the duration of the game in minutes: "))
-        query = ("SELECT team_id, team_name FROM team WHERE team_id = " + str(team_id_1) + " OR team_id = " + str(team_id_2) + ";")
+        query = ("SELECT team_id, team_name FROM team JOIN game ON team_id = team_1_id OR team_id = team_id_2 WHERE game_id = " + str(game_id) + ";")
         retrieval_query(query)
         winner = input('Enter team_id of the team that won the game: ')
         query = (
-            "INSERT INTO game (tournament_id,team_1_id,team_2_id,team_1_roster_id,team_2_roster_id,start_time,start_day,start_month,start_year,duration,winner_team_id) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s , %s, %s);"
+            "INSERT INTO game (duration,winner_team_id) "
+            "VALUES (%s, %s);"
         )
-        data = (tournament_id, team_id_1, team_id_2, roster_team_1_id, roster_team_2_id, start_time, start_day, start_month, start_year, duration, winner)
+        data = (duration, winner)
         mycursor.execute(query,data)
-        game_id = mycursor.lastrowid
-
+        roster_team_1_id = retrieve_attr_val("game", game_id, "team_1_roster_id")
+        roster_team_2_id = retrieve_attr_val("game", game_id, "team_2_roster_id")
 
         add_game_participants(game_id, roster_team_1_id, roster_team_2_id)
+
+
+def modify_game(tournament_id):
+    print("=== Modify a game ===")
+    complete_game = int(input("Enter 1 if you would like to modify a completed game, 2 if you want to modify an incomplete game: "))
+    if complete_game == 1:
+        not_empty = retrieval_query("SELECT * FROM game WHERE tournament_id = " + str(tournament_id) + " AND winner_team_id IS NOT NULL;")
+    else:
+        not_empty = retrieval_query("SELECT * FROM game WHERE tournament_id = " + str(tournament_id) + " AND winner_team_id IS NULL;")
+    if not not_empty:
+        input("This table is empty!")
+    else:
+        game_id = int(input("Enter the game_id of the game you would like to modify: "))
+        print("=== Current values ===")
+        retrieval_query("SELECT * FROM game WHERE game_id = " + str(game_id) + ";")
+
+        old_roster_ids = (retrieve_attr_val("game_id", game_id, "team_1_roster_id"), retrieve_attr_val("game_id", game_id, "team_2_roster_id"))
+        retrieval_query("SELECT * FROM team")
+        team_id_1 = int(input('Enter the first team_id that should participate: '))
+        team_id_2 = int(input('Enter the second team_id that should participate: '))
+        query_team_1 = ("SELECT * FROM roster WHERE team_id = "+str(team_id_1)+ ';')
+        retrieval_query(query_team_1)
+        roster_team_1_id = int(input("Enter roster_id for team 1: "))
+        query_team_2 = ("SELECT * FROM roster WHERE team_id = " +str(team_id_2)+ ';')
+        retrieval_query(query_team_2)
+        roster_team_2_id = int(input("Enter roster_id for team 2: "))
+
+        if not (roster_team_1_id in old_roster_ids) or not (roster_team_2_id in old_roster_ids):
+            query = "DELETE FROM game_participant WHERE game_id = " + str(game_id) + ";"
+            execute_query(query, False)
+
+        start_time = int(input("Enter game start time (military time, no colon): "))
+        start_day = int(input("Enter game start day: "))
+        start_month = int(input("Enter game start month: "))
+        start_year = int(input("Enter game start year: "))
+
+        if complete_game != 1:
+            query = (
+                "INSERT INTO game (tournament_id,team_1_id,team_2_id,team_1_roster_id,team_2_roster_id,start_time,start_day,start_month,start_year,duration,winner_team_id) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s , %s, %s);"
+            )
+            data = (tournament_id,team_id_1,team_id_2,roster_team_1_id,roster_team_2_id,start_time,start_day,start_month,start_year)
+            execute_query(query,True,data)
+        else:
+            mycursor = mydb.cursor()
+            duration = int(input("Enter the duration of the game in minutes: "))
+            query = ("SELECT team_id, team_name FROM team WHERE team_id = " + str(team_id_1) + " OR team_id = " + str(team_id_2) + ";")
+            retrieval_query(query)
+            winner = input('Enter team_id of the team that won the game: ')
+            query = (
+                "INSERT INTO game (tournament_id,team_1_id,team_2_id,team_1_roster_id,team_2_roster_id,start_time,start_day,start_month,start_year,duration,winner_team_id) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s , %s, %s);"
+            )
+            data = (tournament_id, team_id_1, team_id_2, roster_team_1_id, roster_team_2_id, start_time, start_day, start_month, start_year, duration, winner)
+            mycursor.execute(query,data)
+            game_id = mycursor.lastrowid
+
+
+            add_game_participants(game_id, roster_team_1_id, roster_team_2_id)
 
 ## =========================== ADD FUNCTIONS =========================== ##
 def add_game_participants(game_id, team_1_roster_id, team_2_roster_id):
@@ -190,11 +191,9 @@ def add_game_participants(game_id, team_1_roster_id, team_2_roster_id):
         data = (game_id,row[0],kills,deaths )
         execute_query(query_game_part,True,data)
 
-def add_roster():
+def add_roster(team_id):
     mycursor = mydb.cursor()
     print("=== Create a roster ===")
-    retrieval_query("SELECT * FROM team")
-    team_id = int(input("Enter team_id of the team to make this roster for: "))
     query ="SELECT * FROM player WHERE team_id = "+str(team_id)+";"
     retrieval_query(query)
     print("Rosters are comprised of three players")
@@ -297,10 +296,8 @@ def add_team_to_tournament():
     data = (tournament_id, team_id)
     execute_query(query,True,data)
 
-def add_game():
+def add_game(tournament_id):
     print("=== Add a game ===")
-    retrieval_query("SELECT * FROM tournament")
-    tournament_id = int(input("Enter the tournament_id that you would like to add a game to: "))
     retrieval_query("SELECT * FROM team")
     team_id_1 = int(input('Enter the first team_id that should participate: '))
     team_id_2 = int(input('Enter the second team_id that should participate: '))
@@ -444,6 +441,7 @@ def retrieval_query(query):
         name = string.capwords(name)
         header_list.append(name)
     print(tabulate(result, headers=header_list, tablefmt="github"))
+    return len(result) != 0
 
 def retrieve_attr_val(table, tuple_id, attr_name):
   mycursor = mydb.cursor()
@@ -472,7 +470,7 @@ def debug():
         print("2. Describe a table")
         print("3. Execute a query")
         print("4. Back")
-        choice = int(input("Enter your choice(1-4): "))
+        choice = int(input("Enter your choice: "))
         # Handle the user's choice
         if choice == 1:
             list_tables() # List all tables
@@ -498,26 +496,20 @@ def editMenu():
         print("5. Players")
         print("6. Roster")
         print("7. Back") 
-        choice = int(input("Enter your choice(1-5): "))
+        choice = int(input("Enter your choice: "))
         # Handle the user's choice
         if choice == 1:
             tournamentMenu() # List all tables
-            input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 2:
             gameMenu() # Describe a table
-            input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 3:
             teamMenu() # Execute a query
-            input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 4:
             sponsorMenu() # Execute a query
-            input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 5:
             playerMenu()
-            input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 6:
             rosterMenu()
-            input("Press enter to continue...") # Wait for the user to press enter
         else:
             return
 
@@ -531,17 +523,14 @@ def tournamentMenu():
         print("2. Modify a tournament")
         print("3. Delete a tournament")
         print("4. Back") 
-        choice = int(input("Enter your choice(1-4): "))
+        choice = int(input("Enter your choice: "))
         # Handle the user's choice
         if choice == 1:
             add_tournament()
-            input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 2:
             modify_tournament()
-            input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 3:
             delete_item("tournament")
-            input("Press enter to continue...") # Wait for the user to press enter
         else:
             return
 
@@ -552,20 +541,17 @@ def teamMenu():
         retrieval_query("SELECT * FROM team")
         print("-----------------")
         print("1. Add a team")
-        print("2. Modify a team")
+        print("2. Change team name")
         print("3. Delete a team")
         print("4. Back") 
-        choice = int(input("Enter your choice(1-4): "))
+        choice = int(input("Enter your choice: "))
         # Handle the user's choice
         if choice == 1:
             add_team()
-            input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 2:
             modify_team()
-            input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 3:
             delete_item("team")
-            input("Press enter to continue...") # Wait for the user to press enter
         else:
             return
 
@@ -578,14 +564,12 @@ def sponsorMenu():
         print("1. Add a sponsor")
         print("2. Delete a sponsor")
         print("3. Back") 
-        choice = int(input("Enter your choice(1-4): "))
+        choice = int(input("Enter your choice: "))
         # Handle the user's choice
         if choice == 1:
             add_sponsor()
-            input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 2:
             delete_sponsor()
-            input("Press enter to continue...") # Wait for the user to press enter
         else:
             return
 
@@ -599,63 +583,59 @@ def playerMenu():
         print("2. Modify a player")
         print("3. Delete a player")
         print("4. Back") 
-        choice = int(input("Enter your choice(1-4): "))
+        choice = int(input("Enter your choice: "))
         # Handle the user's choice
         if choice == 1:
             add_player()
-            input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 2:
             modify_player()
-            input("Press enter to continue...") # Wait for the user to press enter
         elif choice == 3:
             delete_item("player")
-            input("Press enter to continue...") # Wait for the user to press enter
         else:
             return
 
 def rosterMenu():
     while True:
         os.system('clear') # Clear the screen
+        retrieval_query("SELECT * FROM team")
+        team_id = int(input("Select the ID of the team's rosters you want to view: "))
         print("=== Roster Menu ===")
         print("-------------------")
         print("1. Add a roster")
         print("2. Delete a roster")
         print("3. Back") 
-        choice = int(input("Enter your choice(1-4): "))
+        choice = int(input("Enter your choice: "))
         # Handle the user's choice
         if choice == 1:
-            add_roster()
-            input("Press enter to continue...") # Wait for the user to press enter
+            add_roster(team_id)
         elif choice == 2:
             delete_item("roster")
-            input("Press enter to continue...") # Wait for the user to press enter
         else:
             return
 
 def gameMenu():
     while True:
         os.system('clear') # Clear the screen
+        retrieval_query("SELECT * FROM tournament")
+        tournament_id = int(input("Select the ID of the tournament you want to display games of: "))
         print("=== Game Menu ===")
+        retrieval_query("SELECT * FROM game WHERE tournament_id = " + str(tournament_id))
         print("-----------------")
         print("1. Add a game")
         print("2. Finish an incomplete game")
         print("3. Modify a game")
         print("4. Delete a game")
         print("5. Back") 
-        choice = int(input("Enter your choice(1-4): "))
+        choice = int(input("Enter your choice: "))
         # Handle the user's choice
         if choice == 1:
-            add_game()
-            input("Press enter to continue...") # Wait for the user to press enter
+            add_game(tournament_id)
         if choice == 2:
-            complete_game()
-            input("Press enter to continue...") # Wait for the user to press enter
+            complete_game(tournament_id)
         elif choice == 3:
-            modify_game()
-            input("Press enter to continue...") # Wait for the user to press enter
+            modify_game(tournament_id)
         elif choice == 4:
             delete_item("game")
-            input("Press enter to continue...") # Wait for the user to press enter
         else:
             return
 
@@ -671,7 +651,7 @@ def viewMenu():
         print("2. List Teams")
         print("3. List Players")
         print("4. Back") 
-        choice = int(input("Enter your choice(1-5): "))
+        choice = int(input("Enter your choice: "))
         os.system('clear') # Clear the screen
         # Handle the user's choice
         if choice == 1:
@@ -820,18 +800,15 @@ def listPlayers(filter_attr = "", filter_val = -1):
 # Create an infinite loop to show the menu and handle user input
 while True:
   mainMenu()
-  choice = int(input("Enter your choice (1-4): "))
+  choice = int(input("Enter your choice: "))
   if choice == 1:
     print("Not yet implemented.")
     editMenu() # List all tables
-    input("Press enter to continue...") # Wait for the user to press enter
   elif choice == 2:
     print("Not yet implemented.")
     viewMenu() # Describe a table
-    input("Press enter to continue...") # Wait for the user to press enter
   elif choice == 3:
     debug() # Execute a query
-    input("Press enter to continue...") # Wait for the user to press enter
   elif choice == 4:
     break
   else:
