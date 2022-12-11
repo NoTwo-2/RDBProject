@@ -670,7 +670,7 @@ def listTournaments(filter_attr = "", filter_val = -1):
         elif tourney_id == -2:
             return False
         else:
-            print("1. View teams")
+            print("1. View participating teams")
             print("2. View games")
             print("3. Go back")
             choice = int(input("Select an option: "))
@@ -702,8 +702,8 @@ def listGames(filter_attr = "", filter_val = -1):
         elif game_id == -2:
             return False
         else:
-            print("1. View teams")
-            print("2. View players")
+            print("1. View participating teams")
+            print("2. View participating players")
             print("3. Go back")
             choice = int(input("Select an option: "))
             if choice == 1:
@@ -728,7 +728,7 @@ def listTeams(filter_attr = "", filter_val = -1):
             team_id = retrieve_attr_val("player", filter_val, "team_id")
             query = "SELECT team_id, team_name, win_rate, games_played FROM team NATURAL JOIN team_win_rates WHERE team_id =" + str(team_id) + " ORDER BY win_rate DESC;"
         else:
-            query = "SELECT * FROM team"
+            query = "SELECT team_id, team_name, win_rate, games_played FROM team NATURAL JOIN team_win_rates ORDER BY win_rate DESC;"
         retrieval_query(query)
 
         team_id = int(input("Select team ID you want to view more information about (-1 to go back, -2 to quit to menu): "))
@@ -737,9 +737,9 @@ def listTeams(filter_attr = "", filter_val = -1):
         elif team_id == -2:
             return False
         else:
-            print("1. View games")
-            print("2. View players")
-            print("3. List Tournaments")
+            print("1. View past games")
+            print("2. View team members")
+            print("3. View past tournaments")
             print("4. Go back")
             choice = int(input("Select an option: "))
 
@@ -754,9 +754,9 @@ def listPlayers(filter_attr = "", filter_val = -1):
     no_quit = True
     while no_quit:
         if filter_attr == "game_id":
-            query = ("SELECT P.player_id, in_game_name, team_id, first_name, last_name, start_day, start_month, start_year "
-            "FROM (SELECT * FROM player NATURAL JOIN player_kill_death_ratio) P JOIN game_participant G ON G.player_id = P.player_id WHERE game_id = " + str(filter_val)
-            + " ORDER BY kill_death_ratio DESC;"
+            query = ("SELECT P.player_id, in_game_name, team_id, first_name, last_name, start_day, start_month, start_year, kills AS kills_this_game, deaths AS deaths_this_game "
+            "FROM player P JOIN game_participant G ON G.player_id = P.player_id WHERE game_id = " + str(filter_val)
+            + " ORDER BY kills DESC;"
             )
         elif filter_val != -1:
             query = "SELECT * FROM player NATURAL JOIN player_kill_death_ratio WHERE " + filter_attr + " = " + str(filter_val) + " ORDER BY kill_death_ratio DESC;"
@@ -770,8 +770,8 @@ def listPlayers(filter_attr = "", filter_val = -1):
         elif player_id == -2:
             return False
         else:
-            print("1. View games")
-            print("2. View teams")
+            print("1. View past games")
+            print("2. View team")
             print("3. Go back")
             choice = int(input("Select an option: "))
 
