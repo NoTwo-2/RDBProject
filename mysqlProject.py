@@ -520,6 +520,7 @@ def tournamentMenu():
     while True:
         os.system('clear') # Clear the screen
         print("=== Tournament Menu ===")
+        retrieval_query("SELECT * FROM tournament")
         print("-----------------------")
         print("1. Add a tournament")
         print("2. Modify a tournament")
@@ -543,6 +544,7 @@ def teamMenu():
     while True:
         os.system('clear') # Clear the screen
         print("=== Team Menu ===")
+        retrieval_query("SELECT * FROM team")
         print("-----------------")
         print("1. Add a team")
         print("2. Modify a team")
@@ -566,6 +568,7 @@ def sponsorMenu():
     while True:
         os.system('clear') # Clear the screen
         print("=== Sponsor Menu ===")
+        retrieval_query("SELECT * FROM sponsor")
         print("--------------------")
         print("1. Add a sponsor")
         print("2. Delete a sponsor")
@@ -585,6 +588,7 @@ def playerMenu():
     while True:
         os.system('clear') # Clear the screen
         print("=== Player Menu ===")
+        retrieval_query("SELECT * FROM player")
         print("-------------------")
         print("1. Add a player")
         print("2. Modify a player")
