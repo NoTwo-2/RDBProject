@@ -1,6 +1,9 @@
 # DBProject
 School database project
+
 Project members: Jacob, Hari, Nathan
+
+https://github.com/NowoTwo/RDBProject
 
 # Includes
 - ER Diagram and Relational Schema (.drawio)
