@@ -105,6 +105,7 @@ def complete_game(tournament_id):
 
 
 def modify_game(tournament_id):
+    participants_flushed = False
     print("=== Modify a game ===")
     complete_game = int(input("Enter 1 if you would like to modify a completed game, 2 if you want to modify an incomplete game: "))
     if complete_game == 1:
@@ -132,6 +133,7 @@ def modify_game(tournament_id):
         if not (roster_team_1_id in old_roster_ids) or not (roster_team_2_id in old_roster_ids):
             query = "DELETE FROM game_participant WHERE game_id = " + str(game_id) + ";"
             execute_query(query, False)
+            participants_flushed = True
 
         start_time = int(input("Enter game start time (military time, no colon): "))
         start_day = int(input("Enter the day of the month the game will start: "))
@@ -159,8 +161,8 @@ def modify_game(tournament_id):
             mycursor.execute(query,data)
             game_id = mycursor.lastrowid
 
-
-            add_game_participants(game_id, roster_team_1_id, roster_team_2_id)
+            if participants_flushed:
+                add_game_participants(game_id, roster_team_1_id, roster_team_2_id)
 
 ## =========================== ADD FUNCTIONS =========================== ##
 def add_game_participants(game_id, team_1_roster_id, team_2_roster_id):
