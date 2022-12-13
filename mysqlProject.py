@@ -89,7 +89,7 @@ def complete_game(tournament_id):
 
         mycursor = mydb.cursor()
         duration = int(input("Enter the duration of the game in minutes: "))
-        query = ("SELECT team_id, team_name FROM team JOIN game ON team_id = team_1_id OR team_id = team_id_2 WHERE game_id = " + str(game_id) + ";")
+        query = ("SELECT team_id, team_name FROM team JOIN game ON team_id = team_1_id OR team_id = team_2_id WHERE game_id = " + str(game_id) + ";")
         retrieval_query(query)
         winner = input('Enter team_id of the team that won the game: ')
         query = (
