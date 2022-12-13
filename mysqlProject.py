@@ -93,10 +93,10 @@ def complete_game(tournament_id):
         retrieval_query(query)
         winner = input('Enter team_id of the team that won the game: ')
         query = (
-            "INSERT INTO game (duration,winner_team_id) "
-            "VALUES (%s, %s);"
+            "UPDATE game SET duration = %s, winner_team_id = %s "
+            "WHERE game_id = %s;"
         )
-        data = (duration, winner)
+        data = (duration, winner, game_id)
         mycursor.execute(query,data)
         roster_team_1_id = retrieve_attr_val("game", game_id, "team_1_roster_id")
         roster_team_2_id = retrieve_attr_val("game", game_id, "team_2_roster_id")
@@ -140,10 +140,10 @@ def modify_game(tournament_id):
 
         if complete_game != 1:
             query = (
-                "INSERT INTO game (tournament_id,team_1_id,team_2_id,team_1_roster_id,team_2_roster_id,start_time,start_day,start_month,start_year,duration,winner_team_id) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s , %s, %s);"
+                "UPDATE game SET tournament_id = %s,team_1_id = %s,team_2_id = %s,team_1_roster_id = %s,team_2_roster_id = %s,start_time = %s,start_day = %s,start_month = %s,start_year = %s "
+                "WHERE game_id = %s;"
             )
-            data = (tournament_id,team_id_1,team_id_2,roster_team_1_id,roster_team_2_id,start_time,start_day,start_month,start_year)
+            data = (tournament_id,team_id_1,team_id_2,roster_team_1_id,roster_team_2_id,start_time,start_day,start_month,start_year,game_id)
             execute_query(query,True,data)
         else:
             mycursor = mydb.cursor()
@@ -152,10 +152,10 @@ def modify_game(tournament_id):
             retrieval_query(query)
             winner = input('Enter team_id of the team that won the game: ')
             query = (
-                "INSERT INTO game (tournament_id,team_1_id,team_2_id,team_1_roster_id,team_2_roster_id,start_time,start_day,start_month,start_year,duration,winner_team_id) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s , %s, %s);"
+                "UPDATE game SET tournament_id = %s,team_1_id = %s,team_2_id = %s,team_1_roster_id = %s,team_2_roster_id = %s,start_time = %s,start_day = %s,start_month = %s,start_year = %s,duration = %s,winner_team_id = %s "
+                "WHERE game_id = %s;"
             )
-            data = (tournament_id, team_id_1, team_id_2, roster_team_1_id, roster_team_2_id, start_time, start_day, start_month, start_year, duration, winner)
+            data = (tournament_id, team_id_1, team_id_2, roster_team_1_id, roster_team_2_id, start_time, start_day, start_month, start_year, duration, winner, game_id)
             mycursor.execute(query,data)
             game_id = mycursor.lastrowid
 
